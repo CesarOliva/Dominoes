@@ -50,6 +50,26 @@ export const getSingleProduct = query({
     },
 });
 
+export const removeProduct = mutation({
+    args: {
+        url: v.string(),
+    },
+    handler: async (ctx, { url }) => {
+        const product =  await ctx.db
+            .query("products")
+            .filter((q) => q.eq(q.field("url"), url))
+            .first()
+
+        if(!product){
+            throw new Error("Product not found")
+        }
+
+        await ctx.db.delete(product._id)
+
+        return product._id;
+    },
+})
+
 export const getAllProducts = query({
     args: {},
     handler: async (ctx) => {

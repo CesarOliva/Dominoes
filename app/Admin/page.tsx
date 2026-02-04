@@ -4,10 +4,9 @@ import { toast } from "sonner";
 import { useRouter  } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { CircleCheck, Package, Pencil, Plus, Trash, X } from "lucide-react";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { formatearMoneda } from "@/utils/CurrencyFormat";
-import { useEffect } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 
 const DasboardPage = () => {
@@ -16,9 +15,16 @@ const DasboardPage = () => {
 
     const stats = useQuery(api.products.getProductsStats);
     const products = useQuery(api.products.getAllProducts);
+    const remove = useMutation(api.products.removeProduct)
 
     const handleCreate = () => {
         router.push('/admin/create');
+    }
+
+    const handleRemove = (url: string) => {
+        remove({
+            url: url
+        })
     }
 
     if(loading) return null;
@@ -128,7 +134,7 @@ const DasboardPage = () => {
                                                                     <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
                                                                         <Pencil className="size-6"/>
                                                                     </button>
-                                                                    <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
+                                                                    <button onClick={()=>{handleRemove(url)}} className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
                                                                         <Trash className="size-6"/>
                                                                     </button>
                                                                 </div>
