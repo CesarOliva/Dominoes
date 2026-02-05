@@ -98,14 +98,14 @@ const DasboardPage = () => {
                                                 <thead className="bg-gray-50">
                                                     <tr>
                                                         <th className="py-3 px-6 text-left">Producto</th>
-                                                        <th className="py-3 px-6 text-left">Descripcion</th>
+                                                        <th className="py-3 px-6 text-left">Categorias</th>
                                                         <th className="py-3 px-6 text-left">Precio</th>
                                                         <th className="py-3 px-6 text-left">Stock</th>
                                                         <th className="py-3 px-6 text-left">Acciones</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-200">
-                                                    {products?.map(({ _id, name, price, description, imageUrl, url, onStock }) => (
+                                                    {products?.map(({ _id, name, price, imageUrl, url, onStock }) => (
                                                         <tr key={_id} className="hover:bg-gray-50">
                                                             <td className="py-4 px-6">
                                                                 <div className="flex items-center">
@@ -119,7 +119,7 @@ const DasboardPage = () => {
                                                                 </div>
                                                             </td>
                                                             <td className="py-4 px-6 max-w-[256px]">
-                                                                <p className="text-sm text-gray-700 h-25 overflow-hidden">{description}</p>
+                                                                <p className="text-sm text-gray-700">{''}</p>
                                                             </td>
                                                             <td className="py-4 px-6 font-semibold">{formatearMoneda(price)}</td>
                                                             <td className="py-4 px-6">
@@ -135,7 +135,7 @@ const DasboardPage = () => {
                                                                         <Pencil className="size-6"/>
                                                                     </button>
                                                                     <button onClick={()=>{handleRemove(url)}} className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
-                                                                        <Trash className="size-6"/>
+                                                                        <Trash className="size-6 cursor-pointer"/>
                                                                     </button>
                                                                 </div>
                                                             </td>

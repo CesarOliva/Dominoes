@@ -19,7 +19,6 @@ const ProductEditor = ({ value, onChange }: ProductEditorProps) => {
     },
   })
 
-  // 🚨 MUY IMPORTANTE
   if (!editor) return null
 
   return (

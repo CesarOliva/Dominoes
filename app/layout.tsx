@@ -9,6 +9,7 @@ import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
 import { AuthProvider } from '@/context/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { EdgeStoreProvider } from '@/utils/edgestore';
 
 const workSans = Work_Sans({subsets: ["latin"]});
 
@@ -34,15 +35,17 @@ export default function RootLayout({
     <html lang="es-MX">
       <body className={workSans.className}>
         <ConvexClientProvider>
-          <AuthProvider>
-            <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
-              <Toaster position='bottom-center'/>
-              <ScrollToTop/>
-              <Navbar/>
-              {children}
-              <Footer/>
-            </GoogleOAuthProvider>
-          </AuthProvider>
+          <EdgeStoreProvider>
+            <AuthProvider>
+              <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
+                <Toaster position='bottom-center'/>
+                <ScrollToTop/>
+                <Navbar/>
+                {children}
+                <Footer/>
+              </GoogleOAuthProvider>
+            </AuthProvider>
+          </EdgeStoreProvider>
         </ConvexClientProvider>
       </body>
     </html>

@@ -1,9 +1,12 @@
 "use client";
 
-import { api } from "@/convex/_generated/api";
-import { formatearMoneda } from "@/utils/CurrencyFormat";
-import { useQuery } from "convex/react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { generateHTML } from '@tiptap/html'
+import StarterKit from "@tiptap/starter-kit";
+import { formatearMoneda } from "@/utils/CurrencyFormat";
 import Product from "@/components/Product";
 
 const ProductoPage = () => {
@@ -16,8 +19,35 @@ const ProductoPage = () => {
     );
     
     const products = useQuery(api.products.getRecentProducts)
+
+    const [descriptionJson, setDescriptionJson] = useState<any>(null);
+
+    const descriptionHtml = useMemo(() => {
+        if (!product?.description) return '';
+        
+        try {
+            const json = JSON.parse(product.description);
+            return generateHTML(json, [
+                StarterKit
+            ]);
+        } catch (error) {
+            return '<p>Error al cargar descripción</p>';
+        }
+    }, [product?.description]);
+
+    useEffect(()=>{
+        if(product?.description){
+            try{
+                const json = JSON.parse(product.description)
+                setDescriptionJson(json);
+                console.log(descriptionJson.content)
+            } catch(error){
+                console.log(error)
+            }
+        }
+    }, [product])
     
-    if (product === undefined) {
+    if (product === undefined || !product || !descriptionJson) {
         return(
             <section className="flex flex-col items-center justify-center mt-8 mb-16">
                 <div className="w-[90%] flex flex-col md:flex-row justify-center items-center max-w-300 gap-y-8">
@@ -48,7 +78,8 @@ const ProductoPage = () => {
                 <div className="w-full md:w-1/2 md:ml-4">
                     <h2 className="text-[30px] font-semibold mb-2">{product?.name}</h2>
                     <p className="text-2xl font-semibold text-[#B86112] mb-2">{formatearMoneda(product!.price)}</p>
-                    <p className="text-lg font-normal mb-4">{product?.description}</p>
+                    <div className="prose text-lg font-normal mb-4" dangerouslySetInnerHTML={{ __html: descriptionHtml }}>
+                    </div>
                     <button className="bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white px-6 py-3 rounded-lg transition-colors duration-300">COMPRAR</button>
                 </div>
             </div>

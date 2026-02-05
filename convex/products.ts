@@ -18,6 +18,7 @@ export const createProduct = mutation({
         price: v.number(),
         imageUrl: v.string(),
         url: v.string(),
+        onStock: v.boolean()
     },
     handler: async (ctx, args) => {
         const existing = await ctx.db
