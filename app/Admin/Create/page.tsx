@@ -8,6 +8,7 @@ import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
 import { useEdgeStore } from "@/utils/edgestore";
+import { UploadCloudIcon } from "lucide-react";
 
 type FormErrors =  {
     nombre?: string;
@@ -15,11 +16,12 @@ type FormErrors =  {
     descripcion?: string;
     url?: string;
     imageURL?: string; 
+    categoria?: string
 };
 
 const CreateProductPage = () => {
     const { user, loading } = useAuth();
-    const router = useRouter();
+    const router = useRouter()
     const createProduct = useMutation(api.products.createProduct)
 
     const [errors, setErrors] = useState<FormErrors>({});
@@ -31,7 +33,8 @@ const CreateProductPage = () => {
         nombre: '',
         precio: 0,
         url: '',
-        imageURL: ''
+        imageURL: '',
+        categoria: ''
     });
 
     const handleChange = (e: any) => {
@@ -72,6 +75,10 @@ const CreateProductPage = () => {
         if (!formData.imageURL.trim()) {
             newErrors.url = 'Imagen requerida';
         }
+
+        if (!formData.categoria.trim()) {
+            newErrors.categoria = 'Categoría requerida';
+        }
         
         setErrors(newErrors);
         
@@ -89,14 +96,14 @@ const CreateProductPage = () => {
     }
 
     const handleCreate = ()=>{
-        console.log(formData.nombre, formData.precio, formData.url, descripcion, formData.imageURL)
         createProduct({
             name: formData.nombre,
             description: JSON.stringify(descripcion),
             price: Number(formData.precio),
             imageUrl: formData.imageURL,
             url: formData.url,
-            onStock: true
+            onStock: true,
+            categoryName: formData.categoria,
         })
     }
 
@@ -114,16 +121,22 @@ const CreateProductPage = () => {
                         {formData.imageURL != '' ? (
                             <img className="rounded-lg object-cover size-96 md:size-128" src={formData.imageURL}/>
                         ) : (
-                            <>
+                            <div className="rounded-lg object-cover flex items-center justify-center focus:outline-none border border-neutral-700 p-2 size-96 md:size-128">
+                                {/* <div className='flex flex-col items-center justify-center gap-2 text-center text-xs text-gray-500 dark:text-gray-400'>
+                                    <UploadCloudIcon className="mb-1 size-12" />
+                                    <div className="font-medium text-lg">
+                                        Click or drag file to this area to upload
+                                    </div>
+                                </div> */}
+
                                 <input
                                     type="file"
                                     accept="image/"
                                     onChange={(e)=>{
                                         setFile(e.target.files?.[0])
                                     }}
-                                    className="rounded-lg object-cover focus:outline-none border border-neutral-700 p-2 size-96 md:size-128"
+                                    className=""
                                 />
-
                                 <button onClick={async () => {
                                     if (file) {
                                         const res = await edgestore.publicFiles.upload({
@@ -135,7 +148,7 @@ const CreateProductPage = () => {
                                 }}>
                                     Upload
                                 </button>
-                            </>
+                            </div>
                         )}
                     </div>
 
@@ -170,8 +183,12 @@ const CreateProductPage = () => {
                         />
                         <input
                             type="text"
+                            id='categoria'
+                            name="categoria"
+                            value={formData.categoria}
+                            onChange={handleChange}
                             className="text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-75"
-                            placeholder="Categorias"
+                            placeholder="Categorías"
                         />
                             
                         <button type="submit" className="bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white h-12 w-36 rounded-lg transition-colors duration-300">GUARDAR</button>

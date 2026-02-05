@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const getAdmin = query({
@@ -18,21 +18,46 @@ export const createProduct = mutation({
         price: v.number(),
         imageUrl: v.string(),
         url: v.string(),
-        onStock: v.boolean()
+        onStock: v.boolean(),
+        categoryName: v.string(),
+        parentCategory: v.optional(v.id("categories"))
     },
     handler: async (ctx, args) => {
-        const existing = await ctx.db
+        const existingCategory = await ctx.db
+            .query("categories")
+            .withIndex("by_name_parent", q =>
+                q.eq("categoryName", args.name).eq("parentCategory", args.parentCategory)
+            )
+            .unique();
+
+        let categoryId;
+
+        if(existingCategory){
+           categoryId =  existingCategory._id
+        }else{
+            categoryId = await ctx.db.insert("categories", {
+                categoryName: args.name,
+                parentCategory: args.parentCategory,
+            })
+        }
+
+        const existingProduct = await ctx.db
             .query("products")
             .withIndex("by_url", q => q.eq("url", args.url))
             .unique();
 
-        if (existing) {
+        if (existingProduct) {
             throw new Error("La URL del producto ya existe");
         }
 
         return await ctx.db.insert("products", {
-            ...args,
+            name: args.name,
+            description: args.description,
+            price: args.price,
+            imageUrl: args.imageUrl,
+            url: args.url,
             onStock: true,
+            categoryId
         });
     },
 });

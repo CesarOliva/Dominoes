@@ -9,8 +9,17 @@ export default defineSchema({
         imageUrl: v.string(),
         url: v.string(),
         onStock: v.boolean(),
+        categoryId: v.id("categories")
     })
-    .index("by_url", ["url"]),
+    .index("by_url", ["url"])
+    .index("by_category", ["categoryId"]),
+
+    categories: defineTable({
+        categoryName: v.string(),
+        parentCategory: v.optional(v.id("categories")),
+    })
+    .index("by_name_parent", ["categoryName", "parentCategory"])
+    .index("by_parent", ["parentCategory"]),
 
     admins: defineTable({
         email: v.string(),
