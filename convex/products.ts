@@ -1,4 +1,4 @@
-import { internalMutation, mutation, query } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const getAdmin = query({
@@ -20,13 +20,14 @@ export const createProduct = mutation({
         url: v.string(),
         onStock: v.boolean(),
         categoryName: v.string(),
+        // subCategoryName: v.optional(v.string())
         parentCategory: v.optional(v.id("categories"))
     },
     handler: async (ctx, args) => {
         const existingCategory = await ctx.db
             .query("categories")
             .withIndex("by_name_parent", q =>
-                q.eq("categoryName", args.name).eq("parentCategory", args.parentCategory)
+                q.eq("categoryName", args.categoryName).eq("parentCategory", args.parentCategory)
             )
             .unique();
 
@@ -36,7 +37,7 @@ export const createProduct = mutation({
            categoryId =  existingCategory._id
         }else{
             categoryId = await ctx.db.insert("categories", {
-                categoryName: args.name,
+                categoryName: args.categoryName,
                 parentCategory: args.parentCategory,
             })
         }
@@ -61,6 +62,17 @@ export const createProduct = mutation({
         });
     },
 });
+
+export const getCategories = query({
+    args: {},
+    handler: async(ctx)=>{
+        const categories = await ctx.db
+            .query("categories")
+            .collect();
+
+        return categories
+    }
+})
 
 export const getSingleProduct = query({
     args: {
@@ -100,7 +112,7 @@ export const getAllProducts = query({
     args: {},
     handler: async (ctx) => {
         const products = await ctx.db
-            .query("products").collect();
+            .query("products").order("desc").collect();
 
         return products;
     },
@@ -110,7 +122,7 @@ export const getRecentProducts = query({
     args: {},
     handler: async (ctx) => {
         const products = await ctx.db
-            .query("products").take(4);
+            .query("products").order("desc").take(4);
 
         return products
     }

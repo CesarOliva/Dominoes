@@ -24,7 +24,7 @@ const Footer = () => {
     }, [])
 
     return (
-        <section className="flex items-center justify-center pt-8 bg-white">
+        <footer className="flex items-center justify-center pt-8 bg-white">
             <div className="w-[90%] flex flex-col items-center justify-center max-w-300">
                 <img src="/logo.jpg" alt="Logo Dominoes" className="h-16 mb-4"/>
                 <p className="text-black font-normal text-lg mb-8">Tu mesa de juegos</p>
@@ -79,7 +79,7 @@ const Footer = () => {
                     <h4 className="text-black text-lg">Una web de <span className="font-semibold cursor-pointer"><a target="_blank" href="https://bycesaroliva.com/">César Oliva</a></span></h4>
                 </div>
             </div>
-        </section>
+        </footer>
     );
 }
  

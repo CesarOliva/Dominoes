@@ -15,7 +15,7 @@ const Productos = () => {
                     <span className="text-lg font-medium text-black">Lo nuevo</span>
                     <Link href={'/Catalogo'} className="text-md font-semibold text-black px-4 py-2 border-2 border-black">VER TODOS</Link>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 md:gap-8">
                     {products?.map(({ _id, name, price, imageUrl, url }) => (
                         <Product key={_id} name={name} price={price} imageUrl={imageUrl} url={url}/>
                     ))}

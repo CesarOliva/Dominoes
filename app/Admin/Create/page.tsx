@@ -9,6 +9,7 @@ import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
 import { useEdgeStore } from "@/utils/edgestore";
 import { UploadCloudIcon } from "lucide-react";
+import { toast } from "sonner";
 
 type FormErrors =  {
     nombre?: string;
@@ -16,7 +17,8 @@ type FormErrors =  {
     descripcion?: string;
     url?: string;
     imageURL?: string; 
-    categoria?: string
+    categoria?: string;
+    subcategoria?: string;
 };
 
 const CreateProductPage = () => {
@@ -34,7 +36,8 @@ const CreateProductPage = () => {
         precio: 0,
         url: '',
         imageURL: '',
-        categoria: ''
+        categoria: '',
+        subcategoria: '',
     });
 
     const handleChange = (e: any) => {
@@ -60,8 +63,8 @@ const CreateProductPage = () => {
             newErrors.nombre = 'El nombre es requerido';
         }
     
-        if (!formData.precio) {
-            newErrors.precio = 'El email es requerido';
+        if (!formData.precio || Number(formData.precio)<=0) {
+            newErrors.precio = 'Precio requerido';
         }
     
         if (!descripcion) {
@@ -69,7 +72,7 @@ const CreateProductPage = () => {
         }
     
         if (!formData.url.trim()) {
-            newErrors.url = 'El mensaje es requerido';
+            newErrors.url = 'URL requierida';
         }
 
         if (!formData.imageURL.trim()) {
@@ -78,6 +81,10 @@ const CreateProductPage = () => {
 
         if (!formData.categoria.trim()) {
             newErrors.categoria = 'Categoría requerida';
+        }
+
+        if (!formData.subcategoria.trim()) {
+            newErrors.subcategoria = 'Subcategoría requerida';
         }
         
         setErrors(newErrors);
@@ -96,7 +103,7 @@ const CreateProductPage = () => {
     }
 
     const handleCreate = ()=>{
-        createProduct({
+        const promise = createProduct({
             name: formData.nombre,
             description: JSON.stringify(descripcion),
             price: Number(formData.precio),
@@ -105,6 +112,14 @@ const CreateProductPage = () => {
             onStock: true,
             categoryName: formData.categoria,
         })
+        //    subCategoryName: formData.subcategoria
+            .then(()=> router.push(`/Admin`));
+                
+            toast.promise(promise, {
+                loading: "Creando producto...",
+                success: "Producto creado exitosamente!",
+                error: "Error al crear el producto."
+            })
     }
 
     if(loading) return null;
@@ -128,7 +143,6 @@ const CreateProductPage = () => {
                                         Click or drag file to this area to upload
                                     </div>
                                 </div> */}
-
                                 <input
                                     type="file"
                                     accept="image/"
@@ -159,7 +173,7 @@ const CreateProductPage = () => {
                             name="nombre"
                             value={formData.nombre}
                             onChange={handleChange}
-                            className="text-[30px] font-semibold mb-2 focus:outline-none w-full max-w-100"
+                            className={`text-[30px] font-semibold mb-2 focus:outline-none w-full max-w-100 rounded-md ${errors.nombre ? 'text-red-500': ''}`}
                             placeholder="Nombre"
                         />
                         <input
@@ -168,7 +182,7 @@ const CreateProductPage = () => {
                             name="precio"
                             value={formData.precio}
                             onChange={handleChange}
-                            className="text-2xl font-semibold text-[#B86112] mb-2 focus:outline-none w-full max-w-[150px]"
+                            className={`text-2xl font-semibold text-[#B86112] mb-2 focus:outline-none w-full max-w-50 rounded-md ${errors.precio ? 'text-red-500': ''}`}
                             placeholder="Precio"
                         />
                         <ProductEditor value={descripcion} onChange={setDescripcion}/>
@@ -178,39 +192,33 @@ const CreateProductPage = () => {
                             name="url"
                             value={formData.url}
                             onChange={handleChange}
-                            className="text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-75"
+                            className={`text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-50 rounded-md ${errors.url ? 'text-red-500': ''}`}
                             placeholder="Slug"
                         />
-                        <input
-                            type="text"
-                            id='categoria'
-                            name="categoria"
-                            value={formData.categoria}
-                            onChange={handleChange}
-                            className="text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-75"
-                            placeholder="Categorías"
-                        />
+                        <div className="flex space-x-4">
+                            <input
+                                type="text"
+                                id='categoria'
+                                name="categoria"
+                                value={formData.categoria}
+                                onChange={handleChange}
+                                className={`text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-[150px] rounded-md ${errors.categoria ? 'text-red-500': ''}`}
+                                placeholder="Categoría"
+                            />
+                            <input
+                                type="text"
+                                id='subcategoria'
+                                name="subcategoria"
+                                value={formData.subcategoria}
+                                onChange={handleChange}
+                                className={`text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-[150px] rounded-md ${errors.categoria ? 'text-red-500': ''}`}
+                                placeholder="Subcategoría"
+                            />
+                        </div>
                             
                         <button type="submit" className="bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white h-12 w-36 rounded-lg transition-colors duration-300">GUARDAR</button>
                     </div>
                 </form>
-                {/* <form className="flex w-full " onSubmit={handleCreate}>
-                    <div className="w-full md:w-1/2 flex justify-center">
-                        {imageURL ? (
-                            <img className="rounded-lg object-cover size-96 md:size-128" src={imageURL}/>
-                        ) : (
-                            <input type="file" accept="image/" className="rounded-lg object-cover focus:outline-none border border-neutral-700 p-2 size-96 md:size-128"/>
-                        )}
-                    </div>
-                    <div className="w-full flex flex-col md:w-1/2 md:ml-4">
-                        <input onChange={(e)=>setNombre(e.target.value)} type="text" className="text-[30px] font-semibold mb-2 focus:outline-none w-full max-w-100" placeholder="Nombre"/>
-                        <input onChange={(e)=>setPrecio(90)} type="number" className="text-2xl font-semibold text-[#B86112] mb-2 focus:outline-none w-full max-w-[150px]" placeholder="Precio"/>
-                        <ProductEditor value={descripcion} onChange={setDescripcion}/>
-                        <input onChange={(e)=>setUrl(e.target.value)} type="text" className="text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-75" placeholder="Slug"/>
-                        <input type="text" className="text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-75" placeholder="Categorias"/>
-                        <button type="submit" className="bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white h-12 w-36 rounded-lg transition-colors duration-300">GUARDAR</button>
-                    </div>
-                </form> */}
             </div>
         </section>
     );
