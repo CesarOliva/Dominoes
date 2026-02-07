@@ -8,6 +8,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { formatearMoneda } from "@/utils/CurrencyFormat";
 import { GoogleLogin } from "@react-oauth/google";
+import RemoveDialog from "@/components/ui/AlertDialog";
 
 const DasboardPage = () => {
     const { user, loading, login } = useAuth();
@@ -15,16 +16,9 @@ const DasboardPage = () => {
 
     const stats = useQuery(api.products.getProductsStats);
     const products = useQuery(api.products.getAllProducts);
-    const remove = useMutation(api.products.removeProduct)
 
     const handleCreate = () => {
-        router.push('/admin/create');
-    }
-
-    const handleRemove = (url: string) => {
-        remove({
-            url: url
-        })
+        router.push('/Admin/Create');
     }
 
     if(loading) return null;
@@ -35,10 +29,10 @@ const DasboardPage = () => {
                 <div className="w-full flex items-center justify-center">
                     <div className="w-[90%] md:w-[80%] flex flex-col justify-center items-center">
                         <main className="p-6">
-                            <section className="flex justify-between items-center mb-4">
+                            <section className="flex flex-col sm:flex-row justify-between items-center mb-4">
                                 <div>
-                                    <h2 className="text-3xl font-bold">Gestión de Productos</h2>
-                                    <p className="text-lg text-neutral-600">Administra los productos de tu tienda en linea!</p>
+                                    <h2 className="text-3xl font-bold text-center sm:text-start">Gestión de Productos</h2>
+                                    <p className="text-lg text-neutral-600 text-center sm:text-start mb-2 sm:mb-0">Administra los productos de tu tienda en linea!</p>
                                 </div>
                                 <div className="flex items-center space-x-4">
                                     <button onClick={handleCreate} className="ml-2 px-4 py-2 text-white cursor-pointer rounded-lg bg-black hover:bg-neutral-800 flex items-center font-medium">
@@ -98,28 +92,24 @@ const DasboardPage = () => {
                                                 <thead className="bg-gray-50">
                                                     <tr>
                                                         <th className="py-3 px-6 text-left">Producto</th>
-                                                        <th className="py-3 px-6 text-left">Categorias</th>
                                                         <th className="py-3 px-6 text-left">Precio</th>
                                                         <th className="py-3 px-6 text-left">Stock</th>
                                                         <th className="py-3 px-6 text-left">Acciones</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-200">
-                                                    {products?.map(({ _id, name, price, imageUrl, url, onStock }) => (
+                                                    {products?.map(({ _id, name, price, imageUrl, url, onStock, categoryId }) => (
                                                         <tr key={_id} className="hover:bg-gray-50">
                                                             <td className="py-4 px-6">
-                                                                <div className="flex items-center">
-                                                                    <div className="flex items-center justify-center mr-4">
+                                                                <div className="flex min-w-60 max-w-80 items-center">
+                                                                    <div className="sm:flex items-center justify-center mr-4">
                                                                         <img className='size-12 rounded-md' src={imageUrl} alt={name}/>
                                                                     </div>
                                                                     <div>
                                                                         <p className="font-medium">{name}</p>
-                                                                        <p className="text-gray-500 text-sm">{`/${url}`}</p>
+                                                                        <p className="text-gray-500 text-sm">{`${url}`}</p>
                                                                     </div>
                                                                 </div>
-                                                            </td>
-                                                            <td className="py-4 px-6 max-w-[256px]">
-                                                                <p className="text-sm text-gray-700">{''}</p>
                                                             </td>
                                                             <td className="py-4 px-6 font-semibold">{formatearMoneda(price)}</td>
                                                             <td className="py-4 px-6">
@@ -134,8 +124,8 @@ const DasboardPage = () => {
                                                                     <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
                                                                         <Pencil className="size-6"/>
                                                                     </button>
-                                                                    <button onClick={()=>{handleRemove(url)}} className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
-                                                                        <Trash className="size-6 cursor-pointer"/>
+                                                                    <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
+                                                                        <RemoveDialog url={url}/>
                                                                     </button>
                                                                 </div>
                                                             </td>

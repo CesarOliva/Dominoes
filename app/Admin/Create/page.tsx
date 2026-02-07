@@ -61,30 +61,37 @@ const CreateProductPage = () => {
         
         if (!formData.nombre.trim()) {
             newErrors.nombre = 'El nombre es requerido';
+            toast.error('El nombre es requerido')
         }
     
         if (!formData.precio || Number(formData.precio)<=0) {
             newErrors.precio = 'Precio requerido';
+            toast.error('El precio es requierido');
         }
     
         if (!descripcion) {
             newErrors.descripcion = 'Descripcion requerida'
+            toast.error('Descripción requerida');
         }
     
         if (!formData.url.trim()) {
-            newErrors.url = 'URL requierida';
+            newErrors.url = 'URL requerida';
+            toast.error('URL requerida');
         }
 
         if (!formData.imageURL.trim()) {
             newErrors.url = 'Imagen requerida';
+            toast.error('Imagen requerida');
         }
 
         if (!formData.categoria.trim()) {
             newErrors.categoria = 'Categoría requerida';
+            toast.error('Categoria requerida')
         }
 
         if (!formData.subcategoria.trim()) {
             newErrors.subcategoria = 'Subcategoría requerida';
+            toast.error('Subcategoria requerida');
         }
         
         setErrors(newErrors);
@@ -108,12 +115,12 @@ const CreateProductPage = () => {
             description: JSON.stringify(descripcion),
             price: Number(formData.precio),
             imageUrl: formData.imageURL,
-            url: formData.url,
+            url: formData.url.replace(' ', '_').toLowerCase(),
             onStock: true,
             categoryName: formData.categoria,
+            subCategoryName: formData.subcategoria
         })
-        //    subCategoryName: formData.subcategoria
-            .then(()=> router.push(`/Admin`));
+            .then(()=> router.push('/Admin'));
                 
             toast.promise(promise, {
                 loading: "Creando producto...",
@@ -131,37 +138,37 @@ const CreateProductPage = () => {
     return (
         <section className="flex flex-col items-center justify-center mt-8 mb-16">
             <div className="w-[90%] flex flex-col md:flex-row justify-center items-center max-w-300 gap-y-8">
-                <form onSubmit={handleSubmit} className="flex w-full">
-                    <div className="w-full md:w-1/2 flex justify-center">
+                <form onSubmit={handleSubmit} className="flex w-full flex-col md:flex-row">
+                    <div className="w-full md:w-1/2 flex justify-center mb-4 md:mb-0">
                         {formData.imageURL != '' ? (
                             <img className="rounded-lg object-cover size-96 md:size-128" src={formData.imageURL}/>
                         ) : (
                             <div className="rounded-lg object-cover flex items-center justify-center focus:outline-none border border-neutral-700 p-2 size-96 md:size-128">
-                                {/* <div className='flex flex-col items-center justify-center gap-2 text-center text-xs text-gray-500 dark:text-gray-400'>
+                                <div className='flex flex-col items-center justify-center gap-2 text-center text-xs text-gray-500 dark:text-gray-400'>
                                     <UploadCloudIcon className="mb-1 size-12" />
                                     <div className="font-medium text-lg">
                                         Click or drag file to this area to upload
                                     </div>
-                                </div> */}
-                                <input
-                                    type="file"
-                                    accept="image/"
-                                    onChange={(e)=>{
-                                        setFile(e.target.files?.[0])
-                                    }}
-                                    className=""
-                                />
-                                <button onClick={async () => {
-                                    if (file) {
-                                        const res = await edgestore.publicFiles.upload({
-                                            file
-                                        });
-                                        formData.imageURL = res.url
-                                        console.log(formData.imageURL)
-                                    }
-                                }}>
-                                    Upload
-                                </button>
+                                    <input
+                                        type="file"
+                                        accept="image/"
+                                        onChange={(e)=>{
+                                            setFile(e.target.files?.[0])
+                                        }}
+                                        className=""
+                                    />
+                                    <button onClick={async () => {
+                                        if (file) {
+                                            const res = await edgestore.publicFiles.upload({
+                                                file
+                                            });
+                                            formData.imageURL = res.url
+                                            console.log(formData.imageURL)
+                                        }
+                                    }}>
+                                        Upload
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -202,7 +209,7 @@ const CreateProductPage = () => {
                                 name="categoria"
                                 value={formData.categoria}
                                 onChange={handleChange}
-                                className={`text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-[150px] rounded-md ${errors.categoria ? 'text-red-500': ''}`}
+                                className={`text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-50 rounded-md ${errors.categoria ? 'text-red-500': ''}`}
                                 placeholder="Categoría"
                             />
                             <input
@@ -211,7 +218,7 @@ const CreateProductPage = () => {
                                 name="subcategoria"
                                 value={formData.subcategoria}
                                 onChange={handleChange}
-                                className={`text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-[150px] rounded-md ${errors.categoria ? 'text-red-500': ''}`}
+                                className={`text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-50 rounded-md ${errors.categoria ? 'text-red-500': ''}`}
                                 placeholder="Subcategoría"
                             />
                         </div>

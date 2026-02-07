@@ -1,5 +1,8 @@
-import { mutation, query } from "./_generated/server";
+import { toast } from "sonner";
+import { mutation, MutationCtx, query } from "./_generated/server";
 import { v } from "convex/values";
+import { Id } from "./_generated/dataModel";
+import { id } from "zod/v4/locales";
 
 export const getAdmin = query({
     args: {},
@@ -11,6 +14,26 @@ export const getAdmin = query({
     },
 })
 
+async function getOrCreateCategory(
+    ctx: MutationCtx,
+    name: string,
+    parentCategory?: Id<"categories">
+) {
+    const existing = await ctx.db
+        .query("categories")
+        .withIndex("by_name_parent", q =>
+            q.eq("categoryName", name).eq("parentCategory", parentCategory)
+        )
+        .unique();
+
+    if(existing) return existing._id
+
+    return await ctx.db.insert("categories", {
+        categoryName: name,
+        parentCategory,
+    });
+}
+
 export const createProduct = mutation({
     args: {
         name: v.string(),
@@ -20,36 +43,29 @@ export const createProduct = mutation({
         url: v.string(),
         onStock: v.boolean(),
         categoryName: v.string(),
-        // subCategoryName: v.optional(v.string())
-        parentCategory: v.optional(v.id("categories"))
+        subCategoryName: v.string(),
     },
     handler: async (ctx, args) => {
-        const existingCategory = await ctx.db
-            .query("categories")
-            .withIndex("by_name_parent", q =>
-                q.eq("categoryName", args.categoryName).eq("parentCategory", args.parentCategory)
-            )
-            .unique();
-
-        let categoryId;
-
-        if(existingCategory){
-           categoryId =  existingCategory._id
-        }else{
-            categoryId = await ctx.db.insert("categories", {
-                categoryName: args.categoryName,
-                parentCategory: args.parentCategory,
-            })
-        }
-
         const existingProduct = await ctx.db
             .query("products")
             .withIndex("by_url", q => q.eq("url", args.url))
             .unique();
 
         if (existingProduct) {
+            toast.error('La url del producto ya existe')
             throw new Error("La URL del producto ya existe");
         }
+
+        const categoryId = await getOrCreateCategory(
+            ctx,
+            args.categoryName
+        )
+
+        const subCategoryId = await getOrCreateCategory(
+            ctx,
+            args.subCategoryName,
+            categoryId,
+        )
 
         return await ctx.db.insert("products", {
             name: args.name,
@@ -58,7 +74,7 @@ export const createProduct = mutation({
             imageUrl: args.imageUrl,
             url: args.url,
             onStock: true,
-            categoryId
+            categoryId: subCategoryId,
         });
     },
 });
