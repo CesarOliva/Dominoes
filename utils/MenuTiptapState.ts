@@ -3,7 +3,6 @@ import type { EditorStateSnapshot } from '@tiptap/react'
 
 export function menuBarStateSelector(ctx: EditorStateSnapshot<Editor>) {
   return {
-    // Text formatting
     isBold: ctx.editor.isActive('bold') ?? false,
     canBold: ctx.editor.can().chain().toggleBold().run() ?? false,
     isItalic: ctx.editor.isActive('italic') ?? false,

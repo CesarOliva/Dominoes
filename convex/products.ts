@@ -2,8 +2,8 @@ import { toast } from "sonner";
 import { mutation, MutationCtx, query } from "./_generated/server";
 import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
-import { id } from "zod/v4/locales";
 
+//Get if the login email is the same as the one on the table admins
 export const getAdmin = query({
     args: {},
     handler: async (ctx) => {
@@ -14,6 +14,7 @@ export const getAdmin = query({
     },
 })
 
+//Get categories or create if doesnt exist
 async function getOrCreateCategory(
     ctx: MutationCtx,
     name: string,
@@ -79,6 +80,7 @@ export const createProduct = mutation({
     },
 });
 
+//Get categories for the categories Tree
 export const getCategories = query({
     args: {},
     handler: async(ctx)=>{
@@ -124,6 +126,7 @@ export const removeProduct = mutation({
     },
 })
 
+//Get products for /Catalogo
 export const getAllProducts = query({
     args: {},
     handler: async (ctx) => {
@@ -134,6 +137,7 @@ export const getAllProducts = query({
     },
 });
 
+//Get products for sections as products and newest
 export const getRecentProducts = query({
     args: {},
     handler: async (ctx) => {
@@ -144,6 +148,7 @@ export const getRecentProducts = query({
     }
 })
 
+//Return the number of products on stock, out of stock and total
 export const getProductsStats = query({
     args: {},
     handler: async(ctx) => {

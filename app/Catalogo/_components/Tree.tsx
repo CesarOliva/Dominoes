@@ -36,28 +36,20 @@ type Props = {
 }
 
 export const Tree = ({ categories }: Props) => {
-  return (
-    <>
-        {categories.map(cat => (
-            <div key={cat._id} className="ml-4 mr-4 sm:mr-0">
-                <div className="group flex items-center gap-x-2 px-2 py-1 rounded-md border border-neutral-300 bg-neutral-100 mb-2">
-                    <Square className="cursor-pointer size-6"/> {cat.categoryName}
+    return (
+        <>
+            {categories.map(cat => (
+                <div key={cat._id} className="ml-4 mr-4 sm:mr-0">
+                    <div className="group flex items-center gap-x-2 px-2 py-1 rounded-md border border-neutral-300 bg-neutral-100 mb-2">
+                        <Square onClick={()=> console.log(cat.categoryName)} className="cursor-pointer size-6"/>
+                        
+                        {cat.categoryName}
+                    </div>
+                    {cat.children.length > 0 && (
+                        <Tree categories={cat.children} />
+                    )}
                 </div>
-                {cat.children.length > 0 && (
-                    <Tree categories={cat.children} />
-                )}
-            </div>
-        ))}
-    </>
-    // <div className='group flex items-center gap-x-2 px-2 py-1 rounded-md border border-neutral-300 bg-neutral-100'>
-    //     {categories.map(cat => (
-    //         <div key={cat._id}>
-    //             <Square className="cursor-pointer size-6"/> {cat.categoryName}
-    //             {cat.children.length > 0 && (
-    //             <Tree categories={cat.children} />
-    //             )}
-    //         </div>
-    //     ))}
-    // </div>
-  );
+            ))}
+        </>
+    );
 };

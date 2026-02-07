@@ -9,6 +9,7 @@ import { api } from "../../convex/_generated/api";
 import { formatearMoneda } from "@/utils/CurrencyFormat";
 import { GoogleLogin } from "@react-oauth/google";
 import RemoveDialog from "@/components/ui/AlertDialog";
+import Link from "next/link";
 
 const DasboardPage = () => {
     const { user, loading, login } = useAuth();
@@ -98,18 +99,20 @@ const DasboardPage = () => {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-200">
-                                                    {products?.map(({ _id, name, price, images, url, onStock, categoryId }) => (
+                                                    {products?.map(({ _id, name, price, images, url, onStock }) => (
                                                         <tr key={_id} className="hover:bg-gray-50">
                                                             <td className="py-4 px-6">
-                                                                <div className="flex min-w-60 max-w-80 items-center">
-                                                                    <div className="sm:flex items-center justify-center mr-4">
-                                                                        <img className='size-12 rounded-md' src={images[0]} alt={name}/>
+                                                                <Link href={`/Catalogo/${url}`}>
+                                                                    <div className="flex min-w-60 max-w-80 items-center">
+                                                                        <div className="sm:flex items-center justify-center mr-4">
+                                                                            <img className='size-12 rounded-md' src={images[0]} alt={name}/>
+                                                                        </div>
+                                                                        <div>
+                                                                            <p className="font-medium">{name}</p>
+                                                                            <p className="text-gray-500 text-sm">{`/${url}`}</p>
+                                                                        </div>
                                                                     </div>
-                                                                    <div>
-                                                                        <p className="font-medium">{name}</p>
-                                                                        <p className="text-gray-500 text-sm">{`${url}`}</p>
-                                                                    </div>
-                                                                </div>
+                                                                </Link>
                                                             </td>
                                                             <td className="py-4 px-6 font-semibold">{formatearMoneda(price)}</td>
                                                             <td className="py-4 px-6">

@@ -11,7 +11,6 @@ interface ProductProps {
 const Product = ({
     name, price, images, url
 }: ProductProps )=> {
-    console.log(images)
     return (
         <div className="flex flex-col items-center md:items-start h-auto bg-[#eee] w-full rounded-lg">
             <Link className="p-4" href={`/Catalogo/${url}`}>

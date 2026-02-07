@@ -91,8 +91,6 @@ const CreateProductPage = () => {
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        console.log(descripcion)
-
        if (!validateForm()) {
             return;
         }

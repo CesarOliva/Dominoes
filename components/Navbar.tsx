@@ -3,7 +3,9 @@
 import { ChevronDown, LogOut, Search, ShoppingCart } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import Link from 'next/link';
- import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -13,6 +15,8 @@ const Navbar = () => {
     const infoRef = useRef<HTMLLIElement>(null)
 
     const { logout, user } = useAuth();
+
+    const categories = useQuery(api.products.getCategories)
 
     useEffect(()=>{
         const handleClickOutside = (e:MouseEvent) => {
@@ -49,8 +53,11 @@ const Navbar = () => {
                         {openCatalogo && (
                             <ul className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 text-sm">
                                 <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>VER TODO</Link>
-                                <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>MESAS DE JUEGO</Link>
-                                <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>PRODUCTOS HOGAR</Link>
+                                {categories?.map(cat => (
+                                    (cat.parentCategory == undefined && (
+                                        <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>{cat.categoryName.toUpperCase()}</Link>
+                                    ))
+                                ))}
                             </ul>
                         )}
                     </li>
@@ -100,8 +107,11 @@ const Navbar = () => {
                             {openCatalogo && (
                                 <ul className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 text-sm">
                                     <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>VER TODO</Link>
-                                    <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>MESAS DE JUEGO</Link>
-                                    <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>PRODUCTOS HOGAR</Link>
+                                    {categories?.map(cat => (
+                                        (cat.parentCategory == undefined && (
+                                            <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>{cat.categoryName.toUpperCase()}</Link>
+                                        ))
+                                    ))}
                                 </ul>
                             )}
                         </li>

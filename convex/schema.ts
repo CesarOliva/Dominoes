@@ -11,8 +11,8 @@ export default defineSchema({
         onStock: v.boolean(),
         categoryId: v.id("categories")
     })
-    .index("by_url", ["url"]),
-    // .index("by_category", ["categoryId"]),
+    .index("by_url", ["url"])
+    .index("by_category", ["categoryId"]),
 
     categories: defineTable({
         categoryName: v.string(),
@@ -20,6 +20,7 @@ export default defineSchema({
     })
     .index("by_name_parent", ["categoryName", "parentCategory"]),
 
+    //To compare at login to accept
     admins: defineTable({
         email: v.string(),
     })

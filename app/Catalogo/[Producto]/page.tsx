@@ -8,6 +8,7 @@ import { generateHTML } from '@tiptap/html'
 import StarterKit from "@tiptap/starter-kit";
 import { formatearMoneda } from "@/utils/CurrencyFormat";
 import Product from "@/components/Product";
+import { toast } from "sonner";
 
 const ProductoPage = () => {
     const router = useRouter();
@@ -21,7 +22,8 @@ const ProductoPage = () => {
     const products = useQuery(api.products.getRecentProducts)
 
     const [descriptionJson, setDescriptionJson] = useState<any>(null);
-
+    const [image, setImage] = useState<string | null>(null)
+0
     const descriptionHtml = useMemo(() => {
         if (!product?.description) return '';
         
@@ -40,12 +42,15 @@ const ProductoPage = () => {
             try{
                 const json = JSON.parse(product.description)
                 setDescriptionJson(json);
-                console.log(descriptionJson.content)
             } catch(error){
-                console.log(error)
+                toast.error("Error al cargar el producto")
             }
         }
+        if(product?.images.length){
+            setImage(product!.images[0])
+        }
     }, [product])
+
     
     if (product === undefined || !product || !descriptionJson) {
         return(
@@ -73,10 +78,10 @@ const ProductoPage = () => {
         <section className="flex flex-col items-center justify-center mt-8 mb-16">
             <div className="w-[90%] flex flex-col md:flex-row justify-center max-w-300 gap-y-8">
                 <div className="w-full md:w-1/2 flex flex-col items-center justify-center">
-                    <img className="rounded-lg object-cover size-96 md:size-128" src={product?.images[0]} alt={product?.name}/>
+                    <img className="rounded-lg object-cover size-96 md:size-128" src={image!} alt={product?.name}/>
                     <div className="w-full flex max-w-96 md:max-w-lg mt-3 gap-x-2">
                         {product.images.map(image => 
-                            <img key={image} className="size-24 rounded-md" src={image} alt={product.name} />
+                            <img onClick={()=>setImage(image)} key={image} className="bg-white opacity-60 hover:opacity-100 cursor-pointer size-24 rounded-md" src={image} alt={product.name} />
                         )}
                     </div>
                 </div>
