@@ -71,9 +71,14 @@ const ProductoPage = () => {
 
     return (
         <section className="flex flex-col items-center justify-center mt-8 mb-16">
-            <div className="w-[90%] flex flex-col md:flex-row justify-center items-center max-w-300 gap-y-8">
-                <div className="w-full md:w-1/2 flex justify-center">
-                    <img className="rounded-lg object-cover size-96 md:size-128" src={product?.imageUrl} alt={product?.name}/>
+            <div className="w-[90%] flex flex-col md:flex-row justify-center max-w-300 gap-y-8">
+                <div className="w-full md:w-1/2 flex flex-col items-center justify-center">
+                    <img className="rounded-lg object-cover size-96 md:size-128" src={product?.images[0]} alt={product?.name}/>
+                    <div className="w-full flex max-w-96 md:max-w-lg mt-3 gap-x-2">
+                        {product.images.map(image => 
+                            <img key={image} className="size-24 rounded-md" src={image} alt={product.name} />
+                        )}
+                    </div>
                 </div>
                 <div className="w-full md:w-1/2 md:ml-4">
                     <h2 className="text-[30px] font-semibold mb-2">{product?.name}</h2>
@@ -87,8 +92,8 @@ const ProductoPage = () => {
             <div className="w-[90%] max-w-300 mt-16">
                 <h2 className="text-3xl font-semibold mb-2">Productos Destacados</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-                    {products?.map(({ _id, name, price, imageUrl, url }) => (
-                        <Product key={_id} name={name} price={price} imageUrl={imageUrl} url={url}/>
+                    {products?.map(({ _id, name, price, images, url }) => (
+                        <Product key={_id} name={name} price={price} images={images} url={url}/>
                     ))}
                 </div>
             </div>

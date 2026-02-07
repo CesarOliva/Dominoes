@@ -27,8 +27,8 @@ const CatalogoPage = () => {
                 </aside>
 
                 <div className="grid-products w-full md:w-[80%] px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 h-fit mb-16 md:mb-0">
-                    {products?.map(({ _id, name, price, imageUrl, url }) => (
-                        <Product key={_id} name={name} price={price} imageUrl={imageUrl} url={url}/>
+                    {products?.map(({ _id, name, price, images, url }) => (
+                        <Product key={_id} name={name} price={price} images={images} url={url}/>
                     ))}
                 </div>
             </div>

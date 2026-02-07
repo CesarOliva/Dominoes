@@ -6,7 +6,7 @@ export default defineSchema({
         name: v.string(),
         description: v.string(),
         price: v.number(),
-        imageUrl: v.string(),
+        images: v.array(v.string()),
         url: v.string(),
         onStock: v.boolean(),
         categoryId: v.id("categories")

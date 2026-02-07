@@ -98,12 +98,12 @@ const DasboardPage = () => {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-200">
-                                                    {products?.map(({ _id, name, price, imageUrl, url, onStock, categoryId }) => (
+                                                    {products?.map(({ _id, name, price, images, url, onStock, categoryId }) => (
                                                         <tr key={_id} className="hover:bg-gray-50">
                                                             <td className="py-4 px-6">
                                                                 <div className="flex min-w-60 max-w-80 items-center">
                                                                     <div className="sm:flex items-center justify-center mr-4">
-                                                                        <img className='size-12 rounded-md' src={imageUrl} alt={name}/>
+                                                                        <img className='size-12 rounded-md' src={images[0]} alt={name}/>
                                                                     </div>
                                                                     <div>
                                                                         <p className="font-medium">{name}</p>
