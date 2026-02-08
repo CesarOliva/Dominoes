@@ -137,6 +137,24 @@ export const getAllProducts = query({
     },
 });
 
+export const getProductsByCategories = query({
+    args: {
+        categoryIds: v.array(v.id("categories")),
+    },
+    handler: async (ctx, args) => {
+        return await ctx.db
+            .query("products")
+            .filter(q =>
+                q.or(
+                ...args.categoryIds.map(id =>
+                    q.eq(q.field("categoryId"), id)
+                )
+                )
+            )
+            .collect();
+    }
+})
+
 //Get products for sections as products and newest
 export const getRecentProducts = query({
     args: {},
