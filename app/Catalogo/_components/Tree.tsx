@@ -41,3 +41,17 @@ export function CategoryTree({ categories, selected, onToggle }: Props) {
 
     return <div>{roots.map(renderNode)}</div>;
 }
+
+export function getAllChildren(
+    parentId: Id<"categories">,
+    categories: Category[]
+): Id<"categories">[] {
+    const directChildren = categories.filter(
+        c => c.parentCategory === parentId
+    );
+
+    return directChildren.flatMap(child => [
+        child._id,
+        ...getAllChildren(child._id, categories),
+    ]);
+}

@@ -139,14 +139,17 @@ export const getAllProducts = query({
 
 export const getProductsByCategories = query({
     args: {
-        categoryIds: v.array(v.id("categories")),
+        categoryIds: v.optional(v.array(v.id("categories"))),
     },
     handler: async (ctx, args) => {
+        if(!args.categoryIds || args.categoryIds.length === 0){
+            return await ctx.db.query("products").collect()
+        }
         return await ctx.db
             .query("products")
             .filter(q =>
                 q.or(
-                ...args.categoryIds.map(id =>
+                ...args.categoryIds!.map(id =>
                     q.eq(q.field("categoryId"), id)
                 )
                 )

@@ -5,17 +5,32 @@ import { useState } from "react";
 import { api } from "../../convex/_generated/api";
 import Product from "@/components/Product";
 import { Id } from "@/convex/_generated/dataModel";
-import { CategoryTree } from "./_components/Tree";
+import { CategoryTree, getAllChildren } from "./_components/Tree";
 
 const CatalogoPage = () => {
     const categories = useQuery(api.products.getCategories);
     const [selected, setSelected] = useState<Id<"categories">[]>([]);
 
-    const products = useQuery(api.products.getProductsByCategories,
-        selected.length === 0
-        ? "skip"
-        : { categoryIds: selected }
-    )
+    const expandedCategoryIds = categories
+        ? Array.from(
+            new Set(
+                selected.flatMap(id => {
+                    const hasChildren = categories.some(
+                        c => c.parentCategory === id
+                    )
+
+                    if(hasChildren){
+                        return getAllChildren(id, categories)
+                    }
+
+                    return id
+                })
+            )
+        ): [];
+
+    const products = useQuery(api.products.getProductsByCategories, {
+        categoryIds: expandedCategoryIds,
+    })
 
     const toggleCategory = (id: Id<"categories">) => {
         setSelected(prev =>
