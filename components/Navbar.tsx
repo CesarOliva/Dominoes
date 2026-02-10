@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useAuth } from "@/context/AuthContext";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { useCatalogFilters } from "@/utils/catalogFilters";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +17,15 @@ const Navbar = () => {
     const infoRef = useRef<HTMLLIElement>(null)
 
     const { logout, user } = useAuth();
+
+    const setCategories = useCatalogFilters(
+        state => state.setCategories
+    )
+
+    const handleSelectCategory = (id: Id<"categories">[]) =>{
+        setOpenCatalogo(false);
+        setCategories(id)
+    }
 
     const categories = useQuery(api.products.getCategories)
 
@@ -55,7 +66,7 @@ const Navbar = () => {
                                 <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>VER TODO</Link>
                                 {categories?.map(cat => (
                                     (cat.parentCategory == undefined && (
-                                        <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>{cat.categoryName.toUpperCase()}</Link>
+                                        <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
                                     ))
                                 ))}
                             </ul>
@@ -109,7 +120,7 @@ const Navbar = () => {
                                     <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>VER TODO</Link>
                                     {categories?.map(cat => (
                                         (cat.parentCategory == undefined && (
-                                            <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>{cat.categoryName.toUpperCase()}</Link>
+                                            <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
                                         ))
                                     ))}
                                 </ul>

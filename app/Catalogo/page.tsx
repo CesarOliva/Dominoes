@@ -1,29 +1,33 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../../convex/_generated/api";
 import Product from "@/components/Product";
 import { Id } from "@/convex/_generated/dataModel";
 import { CategoryTree, getAllChildren } from "./_components/Tree";
+import { useCatalogFilters } from "@/utils/catalogFilters";
 
 const CatalogoPage = () => {
+    const {
+        selectedCategories,
+        toggleCategory,
+        reset,
+    } = useCatalogFilters();
+
     const categories = useQuery(api.products.getCategories);
-    const [selected, setSelected] = useState<Id<"categories">[]>([]);
 
     const expandedCategoryIds = categories
         ? Array.from(
             new Set(
-                selected.flatMap(id => {
+                selectedCategories.flatMap(id => {
                     const hasChildren = categories.some(
                         c => c.parentCategory === id
                     )
 
-                    if(hasChildren){
-                        return getAllChildren(id, categories)
-                    }
-
-                    return id
+                    return hasChildren
+                        ? getAllChildren(id, categories)
+                        : id
                 })
             )
         ): [];
@@ -32,13 +36,19 @@ const CatalogoPage = () => {
         categoryIds: expandedCategoryIds,
     })
 
-    const toggleCategory = (id: Id<"categories">) => {
-        setSelected(prev =>
-            prev.includes(id)
-                ? prev.filter(c => c !== id)
-                : [...prev, id]
-        );
-    };
+    // const toggleCategory = (id: Id<"categories">) => {
+    //     setSelected(prev =>
+    //         prev.includes(id)
+    //             ? prev.filter(c => c !== id)
+    //             : [...prev, id]
+    //     );
+    // };
+
+    useEffect(()=>{
+        return () => {
+            reset();
+        }
+    }, [reset])
     
     return (
         <section className="flex items-center justify-center mt-8 mb-16">
@@ -49,7 +59,7 @@ const CatalogoPage = () => {
                     {categories && (
                         <CategoryTree
                             categories={categories}
-                            selected={selected}
+                            selected={selectedCategories}
                             onToggle={toggleCategory}
                         />
                     )}

@@ -3,12 +3,27 @@
 import { ChevronUp } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { useCatalogFilters } from "@/utils/catalogFilters";
 
 const Footer = () => {
     const [openCatalogo, setOpenCatalogo] = useState(false);
     const [openInfo, setOpenInfo] = useState(false);
     const catalogoRef = useRef<HTMLLIElement>(null)
     const infoRef = useRef<HTMLLIElement>(null);
+
+    const setCategories = useCatalogFilters(
+            state => state.setCategories
+        )
+    
+    const handleSelectCategory = (id: Id<"categories">[]) =>{
+        setOpenCatalogo(false);
+        setCategories(id)
+    }
+    
+    const categories = useQuery(api.products.getCategories)
 
     useEffect(()=>{
         const handleClickOutside = (e:MouseEvent) => {
@@ -32,7 +47,7 @@ const Footer = () => {
                     <a target="_blank" href="https://www.facebook.com/mesasdejuegopersonalizadas">
                         <img className='size-10' src="/facebook.svg" alt="Facebook Dominoes"/>
                     </a>
-                    <a target="_blank" href="#">
+                    <a target="_blank" href="https://www.instagram.com/mesasdejuegopersonalizadas/">
                         <img className='size-10' src="/instagram.svg" alt="Instagram Dominoes"/>
                     </a>
                 </div>
@@ -51,8 +66,11 @@ const Footer = () => {
                             {openCatalogo && (
                                 <ul className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 text-sm">
                                     <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>VER TODO</Link>
-                                    <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>MESAS DE JUEGO</Link>
-                                    <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>PRODUCTOS HOGAR</Link>
+                                    {categories?.map(cat => (
+                                        (cat.parentCategory == undefined && (
+                                            <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={()=> handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
+                                        ))
+                                    ))}
                                 </ul>
                             )}
                         </li>
