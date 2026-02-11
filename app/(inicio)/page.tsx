@@ -1,15 +1,15 @@
-import Beneficios from "./_components/Beneficios";
-import Destacado from "./_components/Destacado";
+import CarouselComponent from "./_components/Carousel";
 import Hero from "./_components/Hero";
-import Portada from "./_components/Portada";
+import Destacado from "./_components/Destacado";
+import Beneficios from "./_components/Beneficios";
 import Productos from "./_components/Productos";
 
 const HomePage = () => {
   return (
     <>
-      {/* <Portada/> */}
-      <Hero/>
-      <Destacado/>
+      <CarouselComponent/>
+      {/* <Hero/>
+      <Destacado/> */}
       <Beneficios/>
       <Productos/>
     </>

@@ -10,24 +10,71 @@ import {
     type UploadFn
 } from "@/components/upload/uploader-provider";
 import { useEdgeStore } from "@/utils/edgestore";
-import { FormEvent, useCallback, useState } from "react";
-import { type JSONContent } from '@tiptap/react'
+import { FormEvent, useCallback, useEffect, useState } from "react";
+import { useEditor, type JSONContent } from '@tiptap/react'
 import ProductEditor from "./_components/Editor";
 import { toast } from "sonner";
+import { useEditProduct } from "@/utils/editProduct";
+import type {Product} from '@/utils/editProduct'
+
+type ProductProps = {
+    initialData?: Product
+}
 
 const CreateProductPage = () => {
+    const productToEdit = useEditProduct(
+        (state) => state.productToEdit
+    )
+
+    const setProductToEdit = useEditProduct(
+        (state) => state.setProductToEdit
+    )
+
+    useEffect(()=>{
+        return ()=> {
+            setProductToEdit(null)
+        }
+    }, [])
+
+    return (
+        <ProductForm initialData={productToEdit ?? undefined}/>
+    )
+}
+
+export function ProductForm({initialData}: ProductProps){
+    const isEditMode = !!initialData
+
+
+
+    const [name, setName] = useState<string>(initialData?.name ?? "");
+    const [price, setPrice] = useState<number>(initialData?.price ?? 0)
+    const [description, setDescription] = useState<JSONContent | null>(()=> {
+        if(!initialData?.description) return null;
+
+        try{
+            return JSON.parse(initialData.description)
+        }
+        catch{
+            return null
+        }
+    })
+    const [slug, setSlug] = useState<string>(initialData?.slug ?? "")
+    const [category, setCategory] = useState<string>(initialData?.category ?? "")
+    const [subCategory, setSubCategory] = useState<string>(initialData?.category ?? "")
+    const [images, setImages] = useState<string[]>([])
+
     const router = useRouter()
     const { user, loading } = useAuth();
-    
-    const [descripcion, setDescripcion] = useState<JSONContent | null>(null);
     const {edgestore} = useEdgeStore()
-    const [images, setImages] = useState<string[]>([])
 
     const uploadFn: UploadFn = useCallback(
         async ({ file, onProgressChange, signal }) => {
             const res = await edgestore.publicFiles.upload({
                 file,
                 signal,
+                options: {
+                    temporary: true
+                },
                 onProgressChange,
             });
             setImages(prev => [...prev, res.url]);
@@ -37,56 +84,7 @@ const CreateProductPage = () => {
     
     const createProduct = useMutation(api.products.createProduct)
 
-    const [formData, setFormData] = useState({
-        nombre: '',
-        precio: 0,
-        url: '',
-        categoria: '',
-        subcategoria: '',
-    });
-
-    const handleChange = (e: any) => {
-        const { name, value } = e.target;
-
-        setFormData({
-            ...formData,
-            [name]: value
-        });
-    }
-
-    const validateForm = (): boolean => {
-        
-        if (!formData.nombre.trim()) {
-            toast.error('El nombre es requerido')
-            return false;
-        }
-        if (!formData.precio || Number(formData.precio)<=0) {
-            toast.error('El precio es requierido');
-            return false;
-        }
-        if (!descripcion) {
-            toast.error('Descripción requerida');
-            return false;
-        }
-        if (!formData.url.trim()) {
-            toast.error('URL requerida');
-            return false;
-        }
-        if (images.length == 0) {
-            toast.error('Imagen requerida');
-            return false;
-        }
-        if (!formData.categoria.trim()) {
-            toast.error('Categoria requerida')
-            return false;
-        }
-        if (!formData.subcategoria.trim()) {
-            toast.error('Subcategoria requerida');
-            return false;
-        }
-        
-        return true;
-    };
+    const updateProduct = useMutation(api.products.updateProduct)
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -98,24 +96,85 @@ const CreateProductPage = () => {
         handleCreate();
     }
 
-    const handleCreate = ()=>{
-        const promise = createProduct({
-            name: formData.nombre,
-            description: JSON.stringify(descripcion),
-            price: Number(formData.precio),
-            images: images,
-            url: formData.url.replace(' ', '_').toLowerCase(),
-            onStock: true,
-            categoryName: formData.categoria,
-            subCategoryName: formData.subcategoria
-        })
-            .then(()=> router.push('/Admin'));
-                
-            toast.promise(promise, {
-                loading: "Creando producto...",
-                success: "Producto creado exitosamente!",
-                error: "Error al crear el producto."
+    const validateForm = (): boolean => {
+        if (!name.trim()) {
+            toast.error('El nombre es requerido')
+            return false;
+        }
+        if (price<=0) {
+            toast.error('El precio es requerido');
+            return false;
+        }
+        if (description === null) {
+            toast.error('Descripción requerida');
+            return false;
+        }
+        if (!slug.trim()) {
+            toast.error('URL requerida');
+            return false;
+        }
+        if (images.length == 0) {
+            toast.error('Imagen requerida');
+            return false;
+        }
+        if (!category.trim()) {
+            toast.error('Categoria requerida')
+            return false;
+        }
+        if (!subCategory.trim()) {
+            toast.error('Subcategoria requerida');
+            return false;
+        }
+        
+        return true;
+    };
+
+    const handleCreate = async ()=>{
+        if(isEditMode){
+            const promise = updateProduct({
+                id: initialData._id,
+                name: name,
+                description: JSON.stringify(description),
+                price: price,
+                images: images,
+                slug: slug.replace(' ', '_').toLowerCase(),
+                category: category,
+                subcategory: subCategory
             })
+                .then(()=> router.push('/Admin'));
+                    
+                toast.promise(promise, {
+                    loading: "Creando producto...",
+                    success: "Producto creado exitosamente!",
+                    error: "Error al crear el producto."
+                })
+        }else{
+            const promise = createProduct({
+                name: name,
+                description: JSON.stringify(description),
+                price: price,
+                images: images,
+                url: slug.replace(' ', '_').toLowerCase(),
+                onStock: true,
+                categoryName: category,
+                subCategoryName: subCategory
+            })
+                .then(()=> router.push('/Admin'));
+                    
+                toast.promise(promise, {
+                    loading: "Creando producto...",
+                    success: "Producto creado exitosamente!",
+                    error: "Error al crear el producto."
+                })
+    
+            await Promise.all(
+                images.map((url)=>
+                    edgestore.publicFiles.confirmUpload({
+                        url: url
+                    })
+                )
+            )
+        }
     }
 
     if(loading) return null;
@@ -133,7 +192,7 @@ const CreateProductPage = () => {
                             <div className='flex flex-col items-center justify-center gap-2 text-center text-xs text-gray-500 dark:text-gray-400'>
                                 <UploaderProvider uploadFn={uploadFn} autoUpload>
                                     <ImageUploader
-                                        maxFiles={10}
+                                        maxFiles={6}
                                         maxSize={1024 * 1024 * 1} // 1 MB
                                     />
                                 </UploaderProvider>
@@ -146,8 +205,8 @@ const CreateProductPage = () => {
                             type="text"
                             id="nombre"
                             name="nombre"
-                            value={formData.nombre}
-                            onChange={handleChange}
+                            value={name}
+                            onChange={(e)=>setName(e.target.value)}
                             className='text-[30px] font-semibold mb-2 focus:outline-none w-full max-w-215 rounded-md'
                             placeholder="Nombre"
                         />
@@ -155,18 +214,18 @@ const CreateProductPage = () => {
                             type="number"
                             id="precio"
                             name="precio"
-                            value={formData.precio}
-                            onChange={handleChange}
+                            value={price}
+                            onChange={(e)=>setPrice(+e.target.value)}
                             className='text-2xl font-semibold text-[#B86112] mb-2 focus:outline-none w-full max-w-50 rounded-md'
                             placeholder="Precio"
                         />
-                        <ProductEditor value={descripcion} onChange={setDescripcion}/>
+                        <ProductEditor value={description} onChange={setDescription}/>
                         <input 
                             type="text"
                             id="url"
                             name="url"
-                            value={formData.url}
-                            onChange={handleChange}
+                            value={slug}
+                            onChange={(e)=>setSlug(e.target.value)}
                             className='text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-50 rounded-md'
                             placeholder="Slug"
                         />
@@ -175,8 +234,8 @@ const CreateProductPage = () => {
                                 type="text"
                                 id='categoria'
                                 name="categoria"
-                                value={formData.categoria}
-                                onChange={handleChange}
+                                value={category}
+                                onChange={(e)=>setCategory(e.target.value)}
                                 className='text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-50 rounded-md'
                                 placeholder="Categoría"
                             />
@@ -184,8 +243,8 @@ const CreateProductPage = () => {
                                 type="text"
                                 id='subcategoria'
                                 name="subcategoria"
-                                value={formData.subcategoria}
-                                onChange={handleChange}
+                                value={subCategory}
+                                onChange={(e)=> setSubCategory(e.target.value)}
                                 className='text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-50 rounded-md'
                                 placeholder="Subcategoría"
                             />

@@ -9,8 +9,13 @@ import StarterKit from "@tiptap/starter-kit";
 import { formatearMoneda } from "@/utils/CurrencyFormat";
 import Product from "@/components/Product";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
+import { useEditProduct } from "@/utils/editProduct";
+import { Description } from "@radix-ui/react-alert-dialog";
 
 const ProductoPage = () => {
+    const { user, loading } = useAuth();
+
     const router = useRouter();
     const params = useParams<{ Producto: string }>();
     const producto = params.Producto;
@@ -36,6 +41,10 @@ const ProductoPage = () => {
             return '<p>Error al cargar descripción</p>';
         }
     }, [product?.description]);
+
+    const setProductToEdit = useEditProduct(
+        (state) => state.setProductToEdit
+    );
 
     useEffect(()=>{
         if(product?.description){
@@ -74,6 +83,8 @@ const ProductoPage = () => {
         router.push('/404')
     }
 
+    if(loading) return null
+
     return (
         <section className="flex flex-col items-center justify-center mt-8 mb-16">
             <div className="w-[90%] flex flex-col md:flex-row justify-center max-w-300 gap-y-8">
@@ -88,9 +99,26 @@ const ProductoPage = () => {
                 <div className="w-full md:w-1/2 md:ml-4">
                     <h2 className="text-[30px] font-semibold mb-2">{product?.name}</h2>
                     <p className="text-2xl font-semibold text-[#B86112] mb-2">{formatearMoneda(product!.price)}</p>
-                    <div className="prose text-lg font-normal mb-4" dangerouslySetInnerHTML={{ __html: descriptionHtml }}>
-                    </div>
-                    <button className="bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white px-6 py-3 rounded-lg transition-colors duration-300">COMPRAR</button>
+                    <div className="prose text-lg font-normal mb-4 tiptap" dangerouslySetInnerHTML={{ __html: descriptionHtml }}/>
+                    {!user ? (
+                        <button className="bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white px-6 py-3 rounded-lg transition-colors duration-300">COMPRAR</button>
+                    ) : (
+                        <button onClick={()=> {
+                            setProductToEdit({
+                                _id: product._id,
+                                name: product.name,
+                                price: product.price,
+                                description: product.description,
+                                slug: product.url,
+                                category: product.categoryId,
+                                images: product.images
+                            });
+                            router.push("/Admin/Create")
+                        }} 
+                        className="bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white px-6 py-3 rounded-lg transition-colors duration-300">
+                            EDITAR
+                        </button>
+                    )}
                 </div>
             </div>
 

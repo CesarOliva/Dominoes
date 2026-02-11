@@ -80,6 +80,24 @@ export const createProduct = mutation({
     },
 });
 
+export const updateProduct = mutation({
+    args: {
+        id: v.id("products"),
+        name: v.string(),
+        price: v.number(),
+        description: v.string(),
+        slug: v.string(),
+        category: v.string(),
+        subcategory: v.string(),
+        images: v.array(v.string())
+    },
+    handler: async(ctx, args)=> {
+        const update = await ctx.db.patch(args.id, {...args});
+
+        return update;
+    }
+})
+
 //Get categories for the categories Tree
 export const getCategories = query({
     args: {},
@@ -143,7 +161,7 @@ export const getProductsByCategories = query({
     },
     handler: async (ctx, args) => {
         if(!args.categoryIds || args.categoryIds.length === 0){
-            return await ctx.db.query("products").collect()
+            return await ctx.db.query("products").order("desc").collect()
         }
         return await ctx.db
             .query("products")
@@ -154,6 +172,7 @@ export const getProductsByCategories = query({
                 )
                 )
             )
+            .order("desc")
             .collect();
     }
 })
