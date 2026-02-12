@@ -35,20 +35,6 @@ const CatalogoPage = () => {
     const products = useQuery(api.products.getProductsByCategories, {
         categoryIds: expandedCategoryIds,
     })
-
-    // const toggleCategory = (id: Id<"categories">) => {
-    //     setSelected(prev =>
-    //         prev.includes(id)
-    //             ? prev.filter(c => c !== id)
-    //             : [...prev, id]
-    //     );
-    // };
-
-    useEffect(()=>{
-        return () => {
-            reset();
-        }
-    }, [reset])
     
     return (
         <section className="flex items-center justify-center mt-8 mb-16">

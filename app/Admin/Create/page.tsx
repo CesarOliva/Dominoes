@@ -250,7 +250,7 @@ export function ProductForm({initialData}: ProductProps){
                             name="url"
                             value={slug}
                             onChange={(e)=>setSlug(e.target.value)}
-                            className='text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-50 rounded-md'
+                            className='text-lg font-semibold text-neutral-700 mb-2 focus:outline-none w-full max-w-80 rounded-md'
                             placeholder="Slug"
                         />
                         <div className="flex space-x-4">

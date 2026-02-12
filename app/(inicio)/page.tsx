@@ -8,8 +8,8 @@ const HomePage = () => {
   return (
     <>
       <CarouselComponent/>
-      {/* <Hero/>
-      <Destacado/> */}
+      <Hero/>
+      {/*<Destacado/> */}
       <Beneficios/>
       <Productos/>
     </>

@@ -37,6 +37,23 @@ body{
   outline: none;
 }
 
+.item-carousel{
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-color: #eee;
+}
+
+::selection {
+  background-color: #B86112; /* Color naranja como tus botones */
+  color: white;
+}
+
+::-moz-selection {
+  background-color: #B86112;
+  color: white;
+}
+
 @media screen and (max-width: 640px){
   .grid-products{
     display: grid;

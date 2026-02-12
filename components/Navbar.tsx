@@ -18,6 +18,8 @@ const Navbar = () => {
 
     const { logout, user } = useAuth();
 
+    const { reset } = useCatalogFilters()
+
     const setCategories = useCatalogFilters(
         state => state.setCategories
     )
@@ -43,7 +45,7 @@ const Navbar = () => {
     }, [])
 
     return (
-        <header className="p-4 bg-white">
+        <header className="p-4 sticky top-0 left-0 right-0 bg-white shadow-md z-25">
             <nav className="flex w-full items-center justify-around">
                 <div className="flex items-center">
                     <Link href={'/'}>
@@ -63,9 +65,12 @@ const Navbar = () => {
 
                         {openMesas && (
                             <ul className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-60 text-sm">
-                                <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenMesas(false)}>VER TODO</Link>
+                                <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => {
+                                    setOpenMesas(false);
+                                    reset();
+                                }}>VER TODO</Link>
                                 {categories?.map(cat => (
-                                    (cat.parentCategory == undefined && (
+                                    (cat.parentCategory != undefined && (
                                         <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
                                     ))
                                 ))}
