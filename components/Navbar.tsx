@@ -11,10 +11,10 @@ import { useCatalogFilters } from "@/utils/catalogFilters";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [openCatalogo, setOpenCatalogo] = useState(false);
-    const [openInfo, setOpenInfo] = useState(false);
-    const catalogoRef = useRef<HTMLLIElement>(null)
-    const infoRef = useRef<HTMLLIElement>(null)
+    const [openMesas, setOpenMesas] = useState(false);
+    const [openHogar, setOpenHogar] = useState(false);
+    const mesasRef = useRef<HTMLLIElement>(null)
+    const hogarRef = useRef<HTMLLIElement>(null)
 
     const { logout, user } = useAuth();
 
@@ -23,7 +23,7 @@ const Navbar = () => {
     )
 
     const handleSelectCategory = (id: Id<"categories">[]) =>{
-        setOpenCatalogo(false);
+        setOpenMesas(false);
         setCategories(id)
     }
 
@@ -31,10 +31,10 @@ const Navbar = () => {
 
     useEffect(()=>{
         const handleClickOutside = (e:MouseEvent) => {
-            if(!catalogoRef.current?.contains(e.target as Node) &&
-                !infoRef.current?.contains(e.target as Node)){
-                setOpenCatalogo(false);
-                setOpenInfo(false);
+            if(!mesasRef.current?.contains(e.target as Node) &&
+                !hogarRef.current?.contains(e.target as Node)){
+                setOpenMesas(false);
+                setOpenHogar(false);
             }
         };
 
@@ -53,17 +53,17 @@ const Navbar = () => {
 
                 <ul className="max-w-md md:max-w-2xl flex-wrap justify-center hidden sm:flex font-semibold gap-x-4 md:gap-x-6 text-md md:text-lg items-center">
                     <Link href={'/'} className="cursor-pointer hover:text-[#B86112]">INICIO</Link>
-                    <li ref={catalogoRef} className="relative">
-                        <button onClick={()=> setOpenCatalogo(!openCatalogo)} className="flex items-center gap-0.5 hover:text-[#B86112]">
-                            CATALOGO
-                            <span className={`transition-transform ${openCatalogo ? "rotate-180" : ""}`}>
+                    <li ref={mesasRef} className="relative">
+                        <button onClick={()=> setOpenMesas(!openMesas)} className="flex items-center gap-0.5 hover:text-[#B86112]">
+                            MESAS
+                            <span className={`transition-transform ${openMesas ? "rotate-180" : ""}`}>
                                 <ChevronDown />
                             </span>
                         </button>
 
-                        {openCatalogo && (
-                            <ul className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 text-sm">
-                                <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>VER TODO</Link>
+                        {openMesas && (
+                            <ul className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-60 text-sm">
+                                <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenMesas(false)}>VER TODO</Link>
                                 {categories?.map(cat => (
                                     (cat.parentCategory == undefined && (
                                         <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
@@ -72,24 +72,24 @@ const Navbar = () => {
                             </ul>
                         )}
                     </li>
-                    <Link href={'/Galeria'} className="cursor-pointer hover:text-[#B86112]">GALERÍA</Link>
-                    <li ref={infoRef} className="relative">
-                        <button onClick={()=> setOpenInfo(!openInfo)} className="flex items-center gap-0.5 hover:text-[#B86112]">
-                            INFORMACIÓN
-                            <span className={`transition-transform ${openInfo ? "rotate-180" : ""}`}>
+                    <li ref={hogarRef} className="relative">
+                        <button onClick={()=> setOpenHogar(!openHogar)} className="flex items-center gap-0.5 hover:text-[#B86112]">
+                            HOGAR
+                            <span className={`transition-transform ${openHogar ? "rotate-180" : ""}`}>
                                 <ChevronDown />
                             </span>
                         </button>
 
-                        {openInfo && (
+                        {openHogar && (
                             <ul className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 text-sm">
-                                <Link href="/Quienes-Somos" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenInfo(false)}>¿QUIENES SOMOS?</Link>
-                                <Link href="/Aviso-De-Privacidad" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenInfo(false)}>AVISO DE PRIVACIDAD</Link>
-                                <Link href="/Politica-De-Garantia" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenInfo(false)}>POLÍTICA DE GARANTÍA</Link>
-                                <Link href="/Servicio-Al-Cliente" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenInfo(false)}>SERVICIO AL CLIENTE</Link>
+                                <Link href="/Quienes-Somos" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>¿QUIENES SOMOS?</Link>
+                                <Link href="/Aviso-De-Privacidad" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>AVISO DE PRIVACIDAD</Link>
+                                <Link href="/Politica-De-Garantia" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>POLÍTICA DE GARANTÍA</Link>
+                                <Link href="/Servicio-Al-Cliente" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>SERVICIO AL CLIENTE</Link>
                             </ul>
                         )}
                     </li>
+                    <Link href={'/Galeria'} className="cursor-pointer hover:text-[#B86112]">GALERÍA</Link>
                     <Link href={'/Contacto'} className="cursor-pointer hover:text-[#B86112]">CONTACTO</Link>
                 </ul>
                 
@@ -103,21 +103,22 @@ const Navbar = () => {
                     <img onClick={()=> setIsOpen(!isOpen)} className="block sm:hidden size-6" src="/puntos.png" alt="Ilustrativo"/>
                 </div>
             </nav>
+
             {isOpen && (
                 <div className="sm:hidden mt-2">
                     <ul className="flex flex-col gap-y-3 font-semibold text-md py-2 text-center">
                         <Link href={'/'} className="cursor-pointer hover:text-[#B86112]">INICIO</Link>
-                        <li ref={catalogoRef} className="relative w-full flex items-center justify-center">
-                            <button onClick={()=> setOpenCatalogo(!openCatalogo)} className="flex w-full justify-center items-center gap-0.5 hover:text-[#B86112]">
-                                CATALOGO
-                                <span className={`transition-transform ${openCatalogo ? "rotate-180" : ""}`}>
+                        <li ref={mesasRef} className="relative w-full flex items-center justify-center">
+                            <button onClick={()=> setOpenMesas(!openMesas)} className="flex w-full justify-center items-center gap-0.5 hover:text-[#B86112]">
+                                MESAS
+                                <span className={`transition-transform ${openMesas ? "rotate-180" : ""}`}>
                                     <ChevronDown />
                                 </span>
                             </button>
 
-                            {openCatalogo && (
-                                <ul className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 text-sm">
-                                    <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenCatalogo(false)}>VER TODO</Link>
+                            {openMesas && (
+                                <ul className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-60 text-sm">
+                                    <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenMesas(false)}>VER TODO</Link>
                                     {categories?.map(cat => (
                                         (cat.parentCategory == undefined && (
                                             <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
@@ -126,24 +127,24 @@ const Navbar = () => {
                                 </ul>
                             )}
                         </li>
-                        <Link href={'/Galeria'} className="cursor-pointer hover:text-[#B86112]">GALERÍA</Link>
-                        <li ref={infoRef} className="relative w-full flex items-center justify-center">
-                            <button onClick={()=> setOpenInfo(!openInfo)} className="flex w-full justify-center items-center gap-0.5 hover:text-[#B86112]">
-                                INFORMACIÓN
-                                <span className={`transition-transform ${openInfo ? "rotate-180" : ""}`}>
+                        <li ref={hogarRef} className="relative w-full flex items-center justify-center">
+                            <button onClick={()=> setOpenHogar(!openHogar)} className="flex w-full justify-center items-center gap-0.5 hover:text-[#B86112]">
+                                HOGAR
+                                <span className={`transition-transform ${openHogar ? "rotate-180" : ""}`}>
                                     <ChevronDown />
                                 </span>
                             </button>
 
-                            {openInfo && (
+                            {openHogar && (
                                 <ul className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 text-sm">
-                                    <Link href="/Quienes-Somos" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenInfo(false)}>¿QUIENES SOMOS?</Link>
-                                    <Link href="/Aviso-De-Privacidad" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenInfo(false)}>AVISO DE PRIVACIDAD</Link>
-                                    <Link href="/Politica-De-Garantia" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenInfo(false)}>POLÍTICA DE GARANTÍA</Link>
-                                    <Link href="/Servicio-Al-Cliente" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenInfo(false)}>SERVICIO AL CLIENTE</Link>
+                                    <Link href="/Quienes-Somos" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>¿QUIENES SOMOS?</Link>
+                                    <Link href="/Aviso-De-Privacidad" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>AVISO DE PRIVACIDAD</Link>
+                                    <Link href="/Politica-De-Garantia" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>POLÍTICA DE GARANTÍA</Link>
+                                    <Link href="/Servicio-Al-Cliente" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>SERVICIO AL CLIENTE</Link>
                                 </ul>
                             )}
                         </li>
+                        <Link href={'/Galeria'} className="cursor-pointer hover:text-[#B86112]">GALERÍA</Link>
                         <Link href={'/Contacto'} className="cursor-pointer hover:text-[#B86112]">CONTACTO</Link>
                     </ul>
                 </div>

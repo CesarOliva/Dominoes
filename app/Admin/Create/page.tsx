@@ -16,6 +16,7 @@ import ProductEditor from "./_components/Editor";
 import { toast } from "sonner";
 import { useEditProduct } from "@/utils/editProduct";
 import type {Product} from '@/utils/editProduct'
+import { Trash2Icon } from "lucide-react";
 
 type ProductProps = {
     initialData?: Product
@@ -26,25 +27,17 @@ const CreateProductPage = () => {
         (state) => state.productToEdit
     )
 
-    const setProductToEdit = useEditProduct(
-        (state) => state.setProductToEdit
-    )
-
-    useEffect(()=>{
-        return ()=> {
-            setProductToEdit(null)
-        }
-    }, [])
-
     return (
         <ProductForm initialData={productToEdit ?? undefined}/>
     )
 }
 
 export function ProductForm({initialData}: ProductProps){
+    const setProductToEdit = useEditProduct(
+        (state) => state.setProductToEdit
+    )
+
     const isEditMode = !!initialData
-
-
 
     const [name, setName] = useState<string>(initialData?.name ?? "");
     const [price, setPrice] = useState<number>(initialData?.price ?? 0)
@@ -96,6 +89,12 @@ export function ProductForm({initialData}: ProductProps){
         handleCreate();
     }
 
+    const validateURL = (url: string)=> {
+        if(/[<>%{}|\\^[\]`]/.test(url)) return false;
+        if(/(^|\/)\.\.?(\/|$)/.test(url)) return false
+        if(/^[\/a-zA-Z0-9\-._~!$&'()*+,;=:@]+$/.test(url)) return true
+    }
+
     const validateForm = (): boolean => {
         if (!name.trim()) {
             toast.error('El nombre es requerido')
@@ -112,6 +111,10 @@ export function ProductForm({initialData}: ProductProps){
         if (!slug.trim()) {
             toast.error('URL requerida');
             return false;
+        }
+        if(!validateURL(slug)){
+            toast.error('URL no valida');
+            return false
         }
         if (images.length == 0) {
             toast.error('Imagen requerida');
@@ -142,6 +145,7 @@ export function ProductForm({initialData}: ProductProps){
                 subcategory: subCategory
             })
                 .then(()=> router.push('/Admin'));
+                setProductToEdit(null)
                     
                 toast.promise(promise, {
                     loading: "Creando producto...",
@@ -177,6 +181,12 @@ export function ProductForm({initialData}: ProductProps){
         }
     }
 
+    const handleRemoveImage = async (urlToDelete: string) => {
+        await edgestore.publicFiles.delete({
+            url: urlToDelete,
+        });
+    }
+
     if(loading) return null;
 
     if(!user) {
@@ -187,9 +197,23 @@ export function ProductForm({initialData}: ProductProps){
         <section className="flex flex-col items-center justify-center mt-8 mb-16">
             <div className="w-[90%] flex flex-col md:flex-row justify-center items-center max-w-300 gap-y-8">
                 <form onSubmit={handleSubmit} className="flex w-full flex-col md:flex-row">
-                    <div className="w-full md:w-1/2 flex justify-center mb-4 md:mb-0">
+                    <div className="w-full md:w-1/2 flex justify-center mb-4 md:mb-0 overflow-hidden">
                         <div className="rounded-lg object-cover flex items-center justify-center focus:outline-none border border-neutral-700 p-2 size-96 md:size-128">
                             <div className='flex flex-col items-center justify-center gap-2 text-center text-xs text-gray-500 dark:text-gray-400'>
+                                <div className="flex flex-wrap gap-2 justify-between">
+                                    {initialData?.images.map((url, index)=>(
+                                        <div key={index} className="relative inline-block group">
+                                            <img 
+                                                className="bg-white size-24 rounded-md" 
+                                                src={url} 
+                                                alt={initialData.name} 
+                                            />
+                                            <div onClick={()=> handleRemoveImage(url)} className="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200 absolute top-1 right-1 bg-white rounded-full p-1 shadow-md hover:bg-gray-100">
+                                                <Trash2Icon className="block h-4 w-4 text-muted-foreground" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                                 <UploaderProvider uploadFn={uploadFn} autoUpload>
                                     <ImageUploader
                                         maxFiles={6}
