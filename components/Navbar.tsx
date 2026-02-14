@@ -31,6 +31,9 @@ const Navbar = () => {
 
     const categories = useQuery(api.products.getCategories)
 
+    const productsMesas = useQuery(api.products.getCategoriesByParent, {name: "Mesas de juego"});
+    const productsHogar = useQuery(api.products.getCategoriesByParent, {name: "Productos del hogar"});
+
     useEffect(()=>{
         const handleClickOutside = (e:MouseEvent) => {
             if(!mesasRef.current?.contains(e.target as Node) &&
@@ -69,10 +72,8 @@ const Navbar = () => {
                                     setOpenMesas(false);
                                     reset();
                                 }}>VER TODO</Link>
-                                {categories?.map(cat => (
-                                    (cat.parentCategory != undefined && (
-                                        <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
-                                    ))
+                                {productsMesas?.map(cat => (
+                                    <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
                                 ))}
                             </ul>
                         )}
@@ -87,10 +88,13 @@ const Navbar = () => {
 
                         {openHogar && (
                             <ul className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 text-sm">
-                                <Link href="/Quienes-Somos" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>¿QUIENES SOMOS?</Link>
-                                <Link href="/Aviso-De-Privacidad" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>AVISO DE PRIVACIDAD</Link>
-                                <Link href="/Politica-De-Garantia" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>POLÍTICA DE GARANTÍA</Link>
-                                <Link href="/Servicio-Al-Cliente" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>SERVICIO AL CLIENTE</Link>
+                                <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => {
+                                    setOpenMesas(false);
+                                    reset();
+                                }}>VER TODO</Link>
+                                {productsHogar?.map(cat => (
+                                    <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
+                                ))}
                             </ul>
                         )}
                     </li>
@@ -124,10 +128,8 @@ const Navbar = () => {
                             {openMesas && (
                                 <ul className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-60 text-sm">
                                     <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenMesas(false)}>VER TODO</Link>
-                                    {categories?.map(cat => (
-                                        (cat.parentCategory == undefined && (
-                                            <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
-                                        ))
+                                    {productsHogar?.map(cat => (
+                                        <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
                                     ))}
                                 </ul>
                             )}
@@ -142,10 +144,10 @@ const Navbar = () => {
 
                             {openHogar && (
                                 <ul className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 text-sm">
-                                    <Link href="/Quienes-Somos" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>¿QUIENES SOMOS?</Link>
-                                    <Link href="/Aviso-De-Privacidad" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>AVISO DE PRIVACIDAD</Link>
-                                    <Link href="/Politica-De-Garantia" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>POLÍTICA DE GARANTÍA</Link>
-                                    <Link href="/Servicio-Al-Cliente" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenHogar(false)}>SERVICIO AL CLIENTE</Link>
+                                    <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenMesas(false)}>VER TODO</Link>
+                                    {productsHogar?.map(cat => (
+                                        <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
+                                    ))}
                                 </ul>
                             )}
                         </li>

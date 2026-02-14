@@ -20,8 +20,8 @@ const CarouselComponent = () => {
             ]}
             className="w-full">
             
-            <CarouselContent className="mb-16 md:mb-0">
-                <CarouselItem className="item-carousel flex flex-col items-center justify-center h-[85vh] w-full relative p-12" style={{backgroundImage: "url('/Mesa-Domino-Grand.jpg')"}}>
+            <CarouselContent className="mb-0">
+                <CarouselItem className="item-carousel flex flex-col items-center justify-center h-[85vh] w-full relative p-12" style={{backgroundImage: "url('/Mesa-Domino-Grand-Carousel.jpg')"}}>
                     <div className="absolute inset-0 bg-black/60"></div>
                     <h3 className="text-4xl md:text-5xl font-semibold mb-4 text-white z-10 text-center">Mesa de Dominó Grand.</h3>
                     <p className="text-lg text-neutral-100 font-medium mb-8 z-10 text-center">Área de juego a nivel, personalizada (opcional colocar diseño de ajedrez o Backgammon).</p>

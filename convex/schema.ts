@@ -18,6 +18,8 @@ export default defineSchema({
         categoryName: v.string(),
         parentCategory: v.optional(v.id("categories")),
     })
+    .index("by_categoryName", ["categoryName"])
+    .index("by_parentCategory", ["parentCategory"])
     .index("by_name_parent", ["categoryName", "parentCategory"]),
 
     //To compare at login to accept

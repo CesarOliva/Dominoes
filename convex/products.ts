@@ -110,6 +110,31 @@ export const getCategories = query({
     }
 })
 
+export const getCategoriesByParent = query({
+    args: {
+        name: v.string()
+    },
+    handler: async(ctx, args)=>{
+        const parent = await ctx.db
+            .query("categories")
+            .withIndex("by_categoryName", q => 
+                q.eq("categoryName", args.name)
+            )
+            .unique()
+
+        if(!parent) return [];
+
+        const categories = await ctx.db
+            .query("categories")
+            .withIndex("by_parentCategory", q =>
+                q.eq("parentCategory", parent._id)
+            )
+            .collect();
+
+        return categories
+    }
+})
+
 export const getSingleProduct = query({
     args: {
         url: v.string(),

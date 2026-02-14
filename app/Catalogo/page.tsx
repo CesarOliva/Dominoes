@@ -12,7 +12,6 @@ const CatalogoPage = () => {
     const {
         selectedCategories,
         toggleCategory,
-        reset,
     } = useCatalogFilters();
 
     const categories = useQuery(api.products.getCategories);
