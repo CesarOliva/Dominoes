@@ -35,6 +35,7 @@ async function getOrCreateCategory(
     });
 }
 
+//Create product on Admin/Create
 export const createProduct = mutation({
     args: {
         name: v.string(),
@@ -80,6 +81,7 @@ export const createProduct = mutation({
     },
 });
 
+//Update product on Admin/Create
 export const updateProduct = mutation({
     args: {
         id: v.id("products"),
@@ -98,18 +100,28 @@ export const updateProduct = mutation({
     }
 })
 
-//Get categories for the categories Tree
-export const getCategories = query({
-    args: {},
-    handler: async(ctx)=>{
-        const categories = await ctx.db
-            .query("categories")
-            .collect();
+//remove product on admin dashboard
+export const removeProduct = mutation({
+    args: {
+        url: v.string(),
+    },
+    handler: async (ctx, { url }) => {
+        const product =  await ctx.db
+            .query("products")
+            .filter((q) => q.eq(q.field("url"), url))
+            .first()
 
-        return categories
-    }
+        if(!product){
+            throw new Error("Product not found")
+        }
+
+        await ctx.db.delete(product._id)
+
+        return product._id;
+    },
 })
 
+//Get categories by parent for every single parent category
 export const getCategoriesByParent = query({
     args: {
         name: v.string()
@@ -135,6 +147,7 @@ export const getCategoriesByParent = query({
     }
 })
 
+//Get individual product for Product page
 export const getSingleProduct = query({
     args: {
         url: v.string(),
@@ -149,27 +162,7 @@ export const getSingleProduct = query({
     },
 });
 
-export const removeProduct = mutation({
-    args: {
-        url: v.string(),
-    },
-    handler: async (ctx, { url }) => {
-        const product =  await ctx.db
-            .query("products")
-            .filter((q) => q.eq(q.field("url"), url))
-            .first()
-
-        if(!product){
-            throw new Error("Product not found")
-        }
-
-        await ctx.db.delete(product._id)
-
-        return product._id;
-    },
-})
-
-//Get products for /Catalogo
+//Get products for admin dashboard
 export const getAllProducts = query({
     args: {},
     handler: async (ctx) => {
@@ -180,21 +173,49 @@ export const getAllProducts = query({
     },
 });
 
+//Get products for Catalogo
 export const getProductsByCategories = query({
     args: {
+        parentName: v.string(),
         categoryIds: v.optional(v.array(v.id("categories"))),
     },
     handler: async (ctx, args) => {
+        const parent = await ctx.db.query("categories")
+            .withIndex("by_categoryName", q =>
+                q.eq("categoryName", args.parentName)
+            )
+            .unique();
+
+        if(!parent) return []
+
+        const children = await ctx.db.query("categories")
+            .withIndex("by_parentCategory", q =>
+                q.eq("parentCategory", parent._id)
+            )
+            .collect();
+
+        const childIds = children.map(c => c._id);
+
         if(!args.categoryIds || args.categoryIds.length === 0){
-            return await ctx.db.query("products").order("desc").collect()
+            return await ctx.db.query("products")
+                .filter(q =>
+                    q.or(
+                        ...childIds.map(id=>
+                            q.eq(q.field("categoryId"), id)
+                        )
+                    )
+                )
+                .order("desc")
+                .collect()
         }
+
         return await ctx.db
             .query("products")
             .filter(q =>
                 q.or(
-                ...args.categoryIds!.map(id =>
-                    q.eq(q.field("categoryId"), id)
-                )
+                    ...args.categoryIds!.map(id =>
+                        q.eq(q.field("categoryId"), id)
+                    )
                 )
             )
             .order("desc")

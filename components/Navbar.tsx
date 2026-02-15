@@ -15,6 +15,9 @@ const Navbar = () => {
     const [openHogar, setOpenHogar] = useState(false);
     const mesasRef = useRef<HTMLLIElement>(null)
     const hogarRef = useRef<HTMLLIElement>(null)
+    
+    const productsMesas = useQuery(api.products.getCategoriesByParent, {name: "Mesas de juego"});
+    const productsHogar = useQuery(api.products.getCategoriesByParent, {name: "Productos del hogar"});
 
     const { logout, user } = useAuth();
 
@@ -26,13 +29,9 @@ const Navbar = () => {
 
     const handleSelectCategory = (id: Id<"categories">[]) =>{
         setOpenMesas(false);
+        setOpenHogar(false);
         setCategories(id)
     }
-
-    const categories = useQuery(api.products.getCategories)
-
-    const productsMesas = useQuery(api.products.getCategoriesByParent, {name: "Mesas de juego"});
-    const productsHogar = useQuery(api.products.getCategoriesByParent, {name: "Productos del hogar"});
 
     useEffect(()=>{
         const handleClickOutside = (e:MouseEvent) => {
@@ -68,12 +67,12 @@ const Navbar = () => {
 
                         {openMesas && (
                             <ul className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-60 text-sm">
-                                <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => {
+                                <Link href="/Mesas-De-Juego" className="block px-4 py-2 hover:bg-gray-100" onClick={() => {
                                     setOpenMesas(false);
                                     reset();
                                 }}>VER TODO</Link>
                                 {productsMesas?.map(cat => (
-                                    <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
+                                    <Link key={cat._id} href="/Mesas-De-Juego" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
                                 ))}
                             </ul>
                         )}
@@ -88,12 +87,12 @@ const Navbar = () => {
 
                         {openHogar && (
                             <ul className="absolute top-full left-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 text-sm">
-                                <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => {
+                                <Link href="/Productos-Del-Hogar" className="block px-4 py-2 hover:bg-gray-100" onClick={() => {
                                     setOpenMesas(false);
                                     reset();
                                 }}>VER TODO</Link>
                                 {productsHogar?.map(cat => (
-                                    <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
+                                    <Link key={cat._id} href="/Productos-Del-Hogar" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
                                 ))}
                             </ul>
                         )}
@@ -127,9 +126,9 @@ const Navbar = () => {
 
                             {openMesas && (
                                 <ul className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-60 text-sm">
-                                    <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenMesas(false)}>VER TODO</Link>
-                                    {productsHogar?.map(cat => (
-                                        <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
+                                    <Link href="/Mesas-De-Juego" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenMesas(false)}>VER TODO</Link>
+                                    {productsMesas?.map(cat => (
+                                        <Link key={cat._id} href="/Mesas-De-Juego" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
                                     ))}
                                 </ul>
                             )}
@@ -144,9 +143,9 @@ const Navbar = () => {
 
                             {openHogar && (
                                 <ul className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 text-sm">
-                                    <Link href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenMesas(false)}>VER TODO</Link>
+                                    <Link href="/Productos-Del-Hogar" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenMesas(false)}>VER TODO</Link>
                                     {productsHogar?.map(cat => (
-                                        <Link key={cat._id} href="/Catalogo" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
+                                        <Link key={cat._id} href="/Productos-Del-Hogar" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
                                     ))}
                                 </ul>
                             )}

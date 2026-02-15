@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Mail, Phone, Send, CheckCircle, Facebook } from 'lucide-react';
+import { Mail, Phone, Send, CheckCircle, Facebook, Instagram } from 'lucide-react';
 
 type FormErrors = {
     name?: string;
@@ -66,6 +66,8 @@ const ContactPage = () => {
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
+
+        const form = e.currentTarget;
         
         if (!validateForm()) {
             return;
@@ -73,23 +75,24 @@ const ContactPage = () => {
         
         setIsSubmitting(true);
     
-        // Simulación de envío de formulario
         setTimeout(() => {
-            console.log('Formulario enviado:', formData);
             setIsSubmitting(false);
             setIsSubmitted(true);
+
+            form.submit(); 
             
             setTimeout(() => {
                 setIsSubmitted(false);
                 setFormData({
-                name: '',
-                email: '',
-                phone: '',
-                subject: '',
-                message: ''
-                });
+                    name: '',
+                    email: '',
+                    phone: '',
+                    subject: '',
+                    message: ''
+                });                
             }, 4500);
         }, 1500);
+
     };
 
   return (
@@ -118,7 +121,7 @@ const ContactPage = () => {
                             <p className="text-gray-800">Completa el formulario y nos pondremos en contacto contigo lo antes posible.</p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} action="https://formsubmit.co/cesaroliva.work@gmail.com" method="POST" className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">Nombre completo *</label>
@@ -232,7 +235,6 @@ const ContactPage = () => {
                                     <div className="ml-4">
                                         <h3 className="text-lg font-medium text-gray-900">Teléfono</h3>
                                         <a href='https://wa.me/8132349830' target='_blank' className="text-gray-600">+52 81-3234-9830</a>
-                                        <p className="text-gray-600 text-sm">Lunes a Viernes, 9am - 6pm</p>
                                     </div>
                                 </div>
                                 
@@ -253,7 +255,19 @@ const ContactPage = () => {
                                     </a>
                                     <div className="ml-4">
                                         <h3 className="text-lg font-medium text-gray-900">Facebook</h3>
-                                        <a href='https://www.facebook.com/mesasdejuegopersonalizadas' target='_blanck' className="text-gray-600">Mesas de Juego Personalizadas</a>
+                                        <a href='https://www.facebook.com/mesasdejuegopersonalizadas' target='_blanck' className="text-gray-600">Mesas de Juego Personalizadas</a><br/>
+                                        <a href='https://www.facebook.com/dominoeshogar' target='_blanck' className="text-gray-600">Dominoes Hogar</a>
+                                    </div>
+                                </div>
+                                
+                                <div className="flex items-start">
+                                    <a href='https://www.instagram.com/mesasdejuegopersonalizadas' target='_blanck' className="shrink-0 bg-orange-100 p-3 rounded-lg">
+                                        <Instagram className="w-6 h-6 text-[#B86112]" />
+                                    </a>
+                                    <div className="ml-4">
+                                        <h3 className="text-lg font-medium text-gray-900">Instagram</h3>
+                                        <a href='https://www.instagram.com/mesasdejuegopersonalizadas/' target='_blanck' className="text-gray-600">Mesas de Juego Personalizadas</a><br/>
+                                        <a href='https://www.instagram.com/dominoes.home/' target='_blanck' className="text-gray-600">Dominoes Hogar</a>
                                     </div>
                                 </div>
                             </div>

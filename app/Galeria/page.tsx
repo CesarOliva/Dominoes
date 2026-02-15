@@ -1,32 +1,36 @@
-import { Card, CardContent } from "@/components/ui/card"
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel"
-
 const Galeria = () => {
-  return (
-    <Carousel className="w-full max-w-48 sm:max-w-xs md:max-w-sm">
-      <CarouselContent className="-ml-1">
-        {Array.from({ length: 5 }).map((_, index) => (
-          <CarouselItem key={index} className="basis-1/2 pl-1 lg:basis-1/3">
-            <div className="p-1">
-              <Card>
-                <CardContent className="flex aspect-square items-center justify-center p-6">
-                  <span className="text-2xl font-semibold">{index + 1}</span>
-                </CardContent>
-              </Card>
+    return (
+        <section className="flex items-center justify-center my-16">
+            <div className="w-[90%] flex flex-col md:flex-row flex-wrap md:min-h-[80vh] gap-6 items-center justify-center max-w-300">
+                <div className="w-full max-w-7xl columns-1 sm:columns-2 lg:columns-3 gap-4 md:gap-6 space-y-4 md:space-y-6">
+                    <img src="/Galeria/Blackjack-1.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Mesa de Blackjack" />
+                    <img src="/Galeria/Blackjack-2.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Mesa de Blackjack" />
+                    <img src="/Galeria/Campana-1.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Campana" />
+                    <img src="/Galeria/Comedor-1.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Mesa comedor" />
+                    <img src="/Galeria/Comedor-2.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Mesa comedor" />
+                    <img src="/Galeria/Comedor-3.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Mesa comedor" />
+                    <img src="/Galeria/Domino-1.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Mesa Dominó" />
+                    <img src="/Galeria/Domino-2.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Mesa Dominó" />
+                    <img src="/Galeria/Domino-3.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Mesa Dominó" />
+                    <img src="/Galeria/Fichero-1.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Fichero" />
+                    <img src="/Galeria/Lampara-1.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Lampara baño" />
+                    <img src="/Galeria/Mesa-6-1.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Mesa para 6" />
+                    <img src="/Galeria/Mesa-6-2.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Mesa para 6" />
+                    <img src="/Galeria/Pasamanos-1.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Pasamanos" />
+                    <img src="/Galeria/Poker-1.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Mesa de Poker" />
+                    <img src="/Galeria/Poker-2.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Mesa de Poker" />
+                    <img src="/Galeria/Poker-3.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Mesa de Poker" />
+                    <img src="/Galeria/Repisa-1.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Repisa Flotante" />
+                    <img src="/Galeria/Silla-1.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Silla" />
+                    <img src="/Galeria/Vanity-1.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Silla" />
+                    <img src="/Galeria/Vanity-2.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Vanity" />
+                    <img src="/Galeria/Vanity-3.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Vanity" />
+                    <img src="/Galeria/Vista-1.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Vista" />
+                    <img src="/Galeria/Vista-2.jpg" className="w-full h-auto rounded-md hover:scale-[1.02] transition-transform duration-300 mb-4" alt="Dominoes | Vista" />
+                </div>
             </div>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
-    </Carousel>
-  )
+        </section>
+    );
 }
-
+ 
 export default Galeria;
