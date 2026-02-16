@@ -113,7 +113,7 @@ const DasboardPage = () => {
                                                     {products?.map(({ _id, name, price, images, url, onStock, categoryId, description }) => (
                                                         <tr key={_id} className="hover:bg-gray-50">
                                                             <td className="py-4 px-6">
-                                                                <Link href={`/${url}`}>
+                                                                <Link href={`/Productos/${url}`}>
                                                                     <div className="flex min-w-60 max-w-80 items-center">
                                                                         <div className="sm:flex items-center justify-center mr-4">
                                                                             <img className='size-12 rounded-md' src={images[0]} alt={name}/>

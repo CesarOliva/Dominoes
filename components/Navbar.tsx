@@ -8,6 +8,8 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useCatalogFilters } from "@/utils/catalogFilters";
+import SearchCommand from "./Search";
+import { useSearch } from "@/hooks/use-search";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +17,8 @@ const Navbar = () => {
     const [openHogar, setOpenHogar] = useState(false);
     const mesasRef = useRef<HTMLLIElement>(null)
     const hogarRef = useRef<HTMLLIElement>(null)
+
+    const search = useSearch()
     
     const productsMesas = useQuery(api.products.getCategoriesByParent, {name: "Mesas de juego"});
     const productsHogar = useQuery(api.products.getCategoriesByParent, {name: "Productos del hogar"});
@@ -102,7 +106,7 @@ const Navbar = () => {
                 </ul>
                 
                 <div className="flex gap-4 md:gap-6 items-center">
-                    <Search className="size-6"/>
+                    <Search className="size-6" onClick={search.onOpen}/>
                     {!user ? (
                         <ShoppingCart className="size-6"/>
                     ): (
@@ -115,7 +119,7 @@ const Navbar = () => {
             {isOpen && (
                 <div className="sm:hidden mt-2">
                     <ul className="flex flex-col gap-y-3 font-semibold text-md py-2 text-center">
-                        <Link href={'/'} className="cursor-pointer hover:text-[#B86112]">INICIO</Link>
+                        <Link href={'/'} onClick={()=>setIsOpen(false)} className="cursor-pointer hover:text-[#B86112]">INICIO</Link>
                         <li ref={mesasRef} className="relative w-full flex items-center justify-center">
                             <button onClick={()=> setOpenMesas(!openMesas)} className="flex w-full justify-center items-center gap-0.5 hover:text-[#B86112]">
                                 MESAS
@@ -126,9 +130,16 @@ const Navbar = () => {
 
                             {openMesas && (
                                 <ul className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-60 text-sm">
-                                    <Link href="/Mesas-De-Juego" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenMesas(false)}>VER TODO</Link>
+                                    <Link href="/Mesas-De-Juego" className="block px-4 py-2 hover:bg-gray-100" onClick={() => {
+                                        setOpenMesas(false)
+                                        setIsOpen(false)
+                                        reset()
+                                    }}>VER TODO</Link>
                                     {productsMesas?.map(cat => (
-                                        <Link key={cat._id} href="/Mesas-De-Juego" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
+                                        <Link key={cat._id} href="/Mesas-De-Juego" className="block px-4 py-2 hover:bg-gray-100" onClick={() => {
+                                            handleSelectCategory([cat._id])
+                                            setIsOpen(false)
+                                        }}>{cat.categoryName.toUpperCase()}</Link>
                                     ))}
                                 </ul>
                             )}
@@ -143,15 +154,22 @@ const Navbar = () => {
 
                             {openHogar && (
                                 <ul className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50 text-sm">
-                                    <Link href="/Productos-Del-Hogar" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setOpenMesas(false)}>VER TODO</Link>
+                                    <Link href="/Productos-Del-Hogar" className="block px-4 py-2 hover:bg-gray-100" onClick={() => {
+                                        setOpenMesas(false)
+                                        setIsOpen(false)
+                                        reset()
+                                    }}>VER TODO</Link>
                                     {productsHogar?.map(cat => (
-                                        <Link key={cat._id} href="/Productos-Del-Hogar" className="block px-4 py-2 hover:bg-gray-100" onClick={() => handleSelectCategory([cat._id])}>{cat.categoryName.toUpperCase()}</Link>
+                                        <Link key={cat._id} href="/Productos-Del-Hogar" className="block px-4 py-2 hover:bg-gray-100" onClick={() => {
+                                            handleSelectCategory([cat._id])
+                                            setIsOpen(false)
+                                        }}>{cat.categoryName.toUpperCase()}</Link>
                                     ))}
                                 </ul>
                             )}
                         </li>
-                        <Link href={'/Galeria'} className="cursor-pointer hover:text-[#B86112]">GALERÍA</Link>
-                        <Link href={'/Contacto'} className="cursor-pointer hover:text-[#B86112]">CONTACTO</Link>
+                        <Link href={'/Galeria'} onClick={()=>setIsOpen(false)} className="cursor-pointer hover:text-[#B86112]">GALERÍA</Link>
+                        <Link href={'/Contacto'} onClick={()=>setIsOpen(false)} className="cursor-pointer hover:text-[#B86112]">CONTACTO</Link>
                     </ul>
                 </div>
             )}

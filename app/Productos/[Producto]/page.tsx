@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { generateHTML } from '@tiptap/html'
@@ -58,9 +58,8 @@ const ProductoPage = () => {
             setImage(product!.images[0])
         }
     }, [product])
-
     
-    if (product === undefined || !product || !descriptionJson) {
+    if (product === undefined) {
         return(
             <section className="flex flex-col items-center justify-center mt-8 mb-16">
                 <div className="w-[90%] flex flex-col md:flex-row justify-center items-center max-w-300 gap-y-8">
@@ -78,8 +77,12 @@ const ProductoPage = () => {
         )
     }
 
-    if (product === null){
-        router.push('/404')
+    if(product == null){
+        notFound()
+    }
+
+    if(!descriptionJson){
+        return null
     }
 
     if(loading) return null
@@ -90,7 +93,7 @@ const ProductoPage = () => {
                 <div className="w-full md:w-1/2 flex flex-col items-center justify-center">
                     <img className="rounded-lg object-cover size-96 md:size-128" src={image!} alt={product?.name}/>
                     <div className="w-full flex max-w-96 md:max-w-lg mt-3 gap-x-2">
-                        {product.images.map(image => 
+                        {product?.images.map(image => 
                             <img onClick={()=>setImage(image)} key={image} className="bg-white opacity-60 hover:opacity-100 cursor-pointer size-24 rounded-md" src={image} alt={product.name} />
                         )}
                     </div>

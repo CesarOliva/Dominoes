@@ -10,6 +10,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 import { AuthProvider } from '@/context/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { EdgeStoreProvider } from '@/utils/edgestore';
+import SearchCommand from '@/components/Search';
 
 const workSans = Work_Sans({subsets: ["latin"]});
 
@@ -41,6 +42,7 @@ export default function RootLayout({
                 <Toaster position='bottom-center'/>
                 <ScrollToTop/>
                 <Navbar/>
+                <SearchCommand/>
                 {children}
                 <Footer/>
               </GoogleOAuthProvider>

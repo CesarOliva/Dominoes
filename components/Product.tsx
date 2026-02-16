@@ -13,7 +13,7 @@ const Product = ({
 }: ProductProps )=> {
     return (
         <div className="flex flex-col items-center md:items-start h-auto bg-[#eee] w-full rounded-lg">
-            <Link className="p-4" href={`/${url}`}>
+            <Link className="p-4" href={`/Productos/${url}`}>
                 <img className="rounded-lg size-64 object-cover mb-1" src={images[0]} alt={name} />
                 <div>
                     <p className="text-lg max-w-64 font-semibold">{name}</p>
