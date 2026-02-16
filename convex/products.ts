@@ -100,6 +100,24 @@ export const updateProduct = mutation({
     }
 })
 
+export const updateStock = mutation({
+    args: {
+        id: v.id("products"),
+    }, handler: async (ctx, args) => {
+        const product = await ctx.db.get(args.id)
+
+        if(!product) {
+            toast.error("Error al actualizar")
+        }
+
+        const update = ctx.db.patch(args.id, {
+            onStock: !product?.onStock,
+        })
+        
+        return update
+    }
+})
+
 //remove product on admin dashboard
 export const removeProduct = mutation({
     args: {

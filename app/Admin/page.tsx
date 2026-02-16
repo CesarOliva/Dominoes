@@ -10,6 +10,8 @@ import { formatearMoneda } from "@/utils/CurrencyFormat";
 import { GoogleLogin } from "@react-oauth/google";
 import RemoveDialog from "@/components/ui/AlertDialog";
 import Link from "next/link";
+import { Id } from "@/convex/_generated/dataModel";
+import { useEditProduct } from "@/utils/editProduct";
 
 const DasboardPage = () => {
     const { user, loading, login } = useAuth();
@@ -17,10 +19,19 @@ const DasboardPage = () => {
 
     const stats = useQuery(api.products.getProductsStats);
     const products = useQuery(api.products.getAllProducts);
+    const updateStock = useMutation(api.products.updateStock);
 
     const handleCreate = () => {
         router.push('/Admin/Create');
     }
+
+    const changeStock =  async (_id: Id<"products">) => {
+        await updateStock({id: _id})
+    }
+
+    const setProductToEdit = useEditProduct(
+        (state) => state.setProductToEdit
+    );
 
     if(loading) return null;
 
@@ -99,7 +110,7 @@ const DasboardPage = () => {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-200">
-                                                    {products?.map(({ _id, name, price, images, url, onStock }) => (
+                                                    {products?.map(({ _id, name, price, images, url, onStock, categoryId, description }) => (
                                                         <tr key={_id} className="hover:bg-gray-50">
                                                             <td className="py-4 px-6">
                                                                 <Link href={`/${url}`}>
@@ -117,15 +128,26 @@ const DasboardPage = () => {
                                                             <td className="py-4 px-6 font-semibold">{formatearMoneda(price)}</td>
                                                             <td className="py-4 px-6">
                                                                 {onStock ? (
-                                                                    <CircleCheck className=" bg-green-100 rounded-full text-sm"/>
+                                                                    <CircleCheck onClick={()=> changeStock(_id)} className="cursor-pointer bg-green-100 rounded-full text-sm"/>
                                                                 ): (
-                                                                    <X className="bg-red-100 rounded-full text-sm"/>
+                                                                    <X onClick={()=> changeStock(_id)} className="cursor-pointer bg-red-100 rounded-full text-sm"/>
                                                                 )}
                                                             </td>
                                                             <td className="py-4 px-6">
                                                                 <div className="flex space-x-2">
                                                                     <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
-                                                                        <Pencil className="size-6"/>
+                                                                        <Pencil onClick={()=> {
+                                                                            setProductToEdit({
+                                                                                _id: _id,
+                                                                                name: name,
+                                                                                price: price,
+                                                                                description: description,
+                                                                                slug: url,
+                                                                                category: categoryId,
+                                                                                images: images
+                                                                            });
+                                                                            router.push("/Admin/Create")
+                                                                        }} className="size-6"/>
                                                                     </button>
                                                                     <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
                                                                         <RemoveDialog url={url}/>

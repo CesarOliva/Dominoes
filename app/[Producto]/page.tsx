@@ -11,7 +11,6 @@ import Product from "@/components/Product";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useEditProduct } from "@/utils/editProduct";
-import { Description } from "@radix-ui/react-alert-dialog";
 
 const ProductoPage = () => {
     const { user, loading } = useAuth();
