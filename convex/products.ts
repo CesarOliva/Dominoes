@@ -2,6 +2,8 @@ import { toast } from "sonner";
 import { mutation, MutationCtx, query } from "./_generated/server";
 import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
+import { paginationOptsValidator } from "convex/server";
+
 
 //Get if the login email is the same as the one on the table admins
 export const getAdmin = query({
@@ -100,6 +102,7 @@ export const updateProduct = mutation({
     }
 })
 
+//Change the Stock status
 export const updateStock = mutation({
     args: {
         id: v.id("products"),
@@ -191,9 +194,9 @@ export const getAllProducts = query({
     },
 });
 
-//Get products for Catalogo
 export const getProductsByCategories = query({
     args: {
+        paginationOpts: paginationOptsValidator,
         parentName: v.string(),
         categoryIds: v.optional(v.array(v.id("categories"))),
     },
@@ -204,11 +207,9 @@ export const getProductsByCategories = query({
             )
             .unique();
 
-        if(!parent) return []
-
         const children = await ctx.db.query("categories")
             .withIndex("by_parentCategory", q =>
-                q.eq("parentCategory", parent._id)
+                q.eq("parentCategory", parent!._id)
             )
             .collect();
 
@@ -224,7 +225,7 @@ export const getProductsByCategories = query({
                     )
                 )
                 .order("desc")
-                .collect()
+                .paginate(args.paginationOpts)
         }
 
         return await ctx.db
@@ -237,7 +238,7 @@ export const getProductsByCategories = query({
                 )
             )
             .order("desc")
-            .collect();
+            .paginate(args.paginationOpts)
     }
 })
 

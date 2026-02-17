@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "convex/react";
+import { usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import Product from "@/components/Product";
 import { useCatalogFilters } from "@/utils/catalogFilters";
@@ -14,19 +14,15 @@ const HogarPage = () => {
         toggleCategory,
     } = useCatalogFilters();
 
-    const products = useQuery(api.products.getProductsByCategories, {
-        parentName: "Productos del hogar",
-        categoryIds: selectedCategories,
-    })
+    const {results, status, loadMore} = usePaginatedQuery(
+        api.products.getProductsByCategories, 
+        {
+            parentName: "Productos del hogar",
+            categoryIds: selectedCategories,
+        },
+        {initialNumItems: 10}
+    )
 
-    console.log("Selected: "+selectedCategories)
-
-    useEffect(() => {
-        console.log(categories);
-        console.log(products);
-
-    }, [categories, products]);
-    
     return (
         <section className="flex items-center justify-center mt-8 mb-16">
             <div className="w-[90%] flex flex-col md:flex-row justify-between max-w-300">
@@ -46,10 +42,18 @@ const HogarPage = () => {
                     ))}
                 </aside>
 
-                <div className="grid-products w-full md:w-[80%] px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 h-fit mb-16 md:mb-0">
-                    {products?.map(({ _id, name, price, images, url }) => (
-                        <Product key={_id} name={name} price={price} images={images} url={url}/>
-                    ))}
+                <div className="w-full md:w-[80%] flex flex-col">
+                    <div className="grid-products px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 h-fit mb-16 md:mb-8">
+                        {results?.map(({ _id, name, price, images, url }) => (
+                            <Product key={_id} name={name} price={price} images={images} url={url}/>
+                        ))}
+                    </div>
+
+                    <div className="flex justify-center">
+                        <button className={`text-lg py-2 px-4 bg-neutral-200 hover:bg-neutral-300 rounded-md ${status == "CanLoadMore" ? 'cursor-pointer' : 'cursor-no-drop'}`} onClick={() => loadMore(10)} disabled={status !== "CanLoadMore"}>
+                            Ver más
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>

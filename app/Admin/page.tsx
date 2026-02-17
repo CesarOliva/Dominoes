@@ -99,7 +99,7 @@ const DasboardPage = () => {
                                             <h3 className="text-xl font-semibold">Lista de Productos</h3>
                                         </div>
                                         
-                                        <div className="overflow-x-auto">
+                                        <div className="overflow-x-auto max-h-120">
                                             <table className="w-full">
                                                 <thead className="bg-gray-50">
                                                     <tr>

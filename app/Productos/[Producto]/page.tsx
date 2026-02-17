@@ -103,7 +103,7 @@ const ProductoPage = () => {
                     <p className="text-2xl font-semibold text-[#B86112] mb-2">{formatearMoneda(product!.price)}</p>
                     <div className="prose text-lg font-normal mb-4 tiptap" dangerouslySetInnerHTML={{ __html: descriptionHtml }}/>
                     {!user ? (
-                        <button className="bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white px-6 py-3 rounded-lg transition-colors duration-300">COMPRAR</button>
+                        <button disabled={!product.onStock} className={`bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white px-6 py-3 rounded-lg transition-colors duration-300 ${product.onStock ? "cursor-pointer" : "cursor-no-drop"}`}>COMPRAR</button>
                     ) : (
                         <button onClick={()=> {
                             setProductToEdit({
@@ -117,7 +117,7 @@ const ProductoPage = () => {
                             });
                             router.push("/Admin/Create")
                         }} 
-                        className="bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white px-6 py-3 rounded-lg transition-colors duration-300">
+                        className="bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white px-6 py-3 rounded-lg transition-colors duration-300 cursor-pointer">
                             EDITAR
                         </button>
                     )}

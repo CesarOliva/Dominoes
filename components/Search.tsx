@@ -43,7 +43,7 @@ const SearchCommand = () => {
     }, [toggle])
 
     const onSelect = (url: string)=>{
-        router.push(`/${url}`);
+        router.push(`/Productos/${url}`);
         onClose();
     }
 
