@@ -3,6 +3,7 @@ import { mutation, MutationCtx, query } from "./_generated/server";
 import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
 import { paginationOptsValidator } from "convex/server";
+import { Images } from "lucide-react";
 
 
 //Get if the login email is the same as the one on the table admins
@@ -96,7 +97,25 @@ export const updateProduct = mutation({
         images: v.array(v.string())
     },
     handler: async(ctx, args)=> {
-        const update = await ctx.db.patch(args.id, {...args});
+        const categoryId = await getOrCreateCategory(
+            ctx,
+            args.category
+        )
+
+        const subCategoryId = await getOrCreateCategory(
+            ctx,
+            args.subcategory,
+            categoryId,
+        )
+
+        const update = await ctx.db.patch(args.id, {
+            name: args.name,
+            description: args.description,
+            price: args.price,
+            images: args.images,
+            url: args.slug,
+            categoryId: subCategoryId,
+        });
 
         return update;
     }
@@ -142,6 +161,25 @@ export const removeProduct = mutation({
     },
 })
 
+export const removeImage = mutation({
+    args: {
+        id: v.id("products"),
+        images: v.array(v.string()),
+    }, handler: async (ctx, args) => {
+        const product = await ctx.db.get(args.id)
+
+        if(!product) {
+            toast.error("Error al actualizar")
+        }
+
+        const update = ctx.db.patch(args.id, {
+            images: args?.images,
+        })
+        
+        return update
+    }
+})
+
 //Get categories by parent for every single parent category
 export const getCategoriesByParent = query({
     args: {
@@ -165,6 +203,28 @@ export const getCategoriesByParent = query({
             .collect();
 
         return categories
+    }
+});
+
+export const getCategoriesName = query({
+    args: {
+        categoryId: v.optional(v.id("categories"))
+    },
+    handler: async (ctx, args) => {
+        const subcategory = await ctx.db
+            .query("categories")
+            .filter((q) => q.eq(q.field("_id"), args.categoryId))
+            .unique()
+
+        const parentCategory = await ctx.db
+            .query("categories")
+            .filter((q) => q.eq(q.field("_id"), subcategory?.parentCategory))
+            .unique()
+
+        return {
+            subcategory,
+            parentCategory,
+        }
     }
 })
 

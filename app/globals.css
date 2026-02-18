@@ -40,7 +40,7 @@ body{
 .item-carousel{
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: top center;
+  background-position: center center;
   background-color: #eee;
 }
 

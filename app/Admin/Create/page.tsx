@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -33,9 +33,38 @@ const CreateProductPage = () => {
 }
 
 export function ProductForm({initialData}: ProductProps){
+    const { user, loading } = useAuth();
+    const router = useRouter()
+    const {edgestore} = useEdgeStore()
+
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(()=>{
+        setIsMounted(true);
+    }, []);
+
+    useEffect(()=>{
+        if(isMounted && !loading && !user){
+            router.push('/');
+        }
+    }, [isMounted, loading, user, router])
+
     const setProductToEdit = useEditProduct(
         (state) => state.setProductToEdit
     )
+
+    const categories = useQuery(api.products.getCategoriesName, 
+        initialData?.category
+            ? {categoryId: initialData?.category}
+            : "skip"
+    ) 
+
+    useEffect(()=>{
+        if(categories){
+            setCategory(categories?.parentCategory?.categoryName ?? "")
+            setSubCategory(categories.subcategory?.categoryName ?? "")
+        }
+    }, [categories])
 
     const isEditMode = !!initialData
 
@@ -52,13 +81,9 @@ export function ProductForm({initialData}: ProductProps){
         }
     })
     const [slug, setSlug] = useState<string>(initialData?.slug ?? "")
-    const [category, setCategory] = useState<string>(initialData?.category ?? "")
-    const [subCategory, setSubCategory] = useState<string>(initialData?.category ?? "")
-    const [images, setImages] = useState<string[]>([])
-
-    const router = useRouter()
-    const { user, loading } = useAuth();
-    const {edgestore} = useEdgeStore()
+    const [category, setCategory] = useState<string>(categories?.parentCategory?.categoryName ?? "")
+    const [subCategory, setSubCategory] = useState<string>(categories?.subcategory?.categoryName ?? "")
+    const [images, setImages] = useState<string[]>(initialData?.images ?? [])
 
     const uploadFn: UploadFn = useCallback(
         async ({ file, onProgressChange, signal }) => {
@@ -76,8 +101,8 @@ export function ProductForm({initialData}: ProductProps){
     );
     
     const createProduct = useMutation(api.products.createProduct)
-
     const updateProduct = useMutation(api.products.updateProduct)
+    const removeImage = useMutation(api.products.removeImage)
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -141,8 +166,8 @@ export function ProductForm({initialData}: ProductProps){
                 price: price,
                 images: images,
                 slug: slug.replace(' ', '_').toLowerCase(),
-                category: category,
-                subcategory: subCategory
+                category: categories!.parentCategory!.categoryName,
+                subcategory: categories!.subcategory!.categoryName
             })
                 .then(()=> router.push('/Admin'));
                 setProductToEdit(null)
@@ -185,15 +210,23 @@ export function ProductForm({initialData}: ProductProps){
         await edgestore.publicFiles.delete({
             url: urlToDelete,
         });
+        
+        const index = images.indexOf(urlToDelete)
+        if(index > -1){
+            images.splice(index, 1)
+        }
+
+        setImages(prevImages => prevImages.filter(url => url !== urlToDelete));
+
+        const remove = removeImage({
+            id: initialData!._id,
+            images: images
+        })
     }
 
-    useEffect(()=>{
-        if(!user) {
-            router.push('/')
-        }
-    }, [])
+    if(loading || !isMounted) return null;
 
-    if(loading) return null;
+    if(!user) return null
 
     return (
         <>
@@ -212,7 +245,9 @@ export function ProductForm({initialData}: ProductProps){
                                                         src={url} 
                                                         alt={initialData.name} 
                                                     />
-                                                    <div onClick={()=> handleRemoveImage(url)} className="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200 absolute top-1 right-1 bg-white rounded-full p-1 shadow-md hover:bg-gray-100">
+                                                    <div onClick={()=> {
+                                                        handleRemoveImage(url);
+                                                    }} className="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200 absolute top-1 right-1 bg-white rounded-full p-1 shadow-md hover:bg-gray-100">
                                                         <Trash2Icon className="block h-4 w-4 text-muted-foreground" />
                                                     </div>
                                                 </div>
