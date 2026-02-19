@@ -1,15 +1,15 @@
 "use client";
 
-import { ChevronDown, LogOut, Search, ShoppingCart } from "lucide-react";
+import { ChevronDown, Search, ShoppingCart, User } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import Link from 'next/link';
-import { useAuth } from "@/context/AuthContext";
-import { useQuery } from "convex/react";
+import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useCatalogFilters } from "@/utils/catalogFilters";
-import SearchCommand from "./Search";
 import { useSearch } from "@/hooks/use-search";
+import { SignInButton, UserButton } from "@clerk/clerk-react";
+import Cart from "./Cart";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -23,7 +23,7 @@ const Navbar = () => {
     const productsMesas = useQuery(api.products.getCategoriesByParent, {name: "Mesas de juego"});
     const productsHogar = useQuery(api.products.getCategoriesByParent, {name: "Productos del hogar"});
 
-    const { logout, user } = useAuth();
+    const { isAuthenticated, isLoading } = useConvexAuth();
 
     const { reset } = useCatalogFilters()
 
@@ -107,10 +107,17 @@ const Navbar = () => {
                 
                 <div className="flex gap-4 md:gap-6 items-center">
                     <Search className="size-6" onClick={search.onOpen}/>
-                    {!user ? (
-                        <ShoppingCart className="size-6"/>
-                    ): (
-                        <LogOut className="size-6 cursor-pointer" onClick={logout}/>
+                    <Cart/>
+                    {isLoading && (
+                        <p>...</p>
+                    )}
+                    {!isAuthenticated && !isLoading && (
+                        <SignInButton>
+                            <User className="size-6 cursor-pointer"/>
+                        </SignInButton>
+                    )}
+                    {isAuthenticated && !isLoading && (
+                        <UserButton afterSignOutUrl="/"/>
                     )}
                     <img onClick={()=> setIsOpen(!isOpen)} className="block sm:hidden size-6" src="/puntos.png" alt="Ilustrativo"/>
                 </div>

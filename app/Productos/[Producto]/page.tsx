@@ -11,9 +11,11 @@ import Product from "@/components/Product";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useEditProduct } from "@/utils/editProduct";
+import { useCart } from "@/providers/cart-provider";
 
 const ProductoPage = () => {
     const { user, loading } = useAuth();
+    const { dispatch } = useCart();
 
     const router = useRouter();
     const params = useParams<{ Producto: string }>();
@@ -92,9 +94,9 @@ const ProductoPage = () => {
             <div className="w-[90%] flex flex-col md:flex-row justify-center max-w-300 gap-y-8">
                 <div className="w-full md:w-1/2 flex flex-col items-center justify-center">
                     <img className="rounded-lg object-cover size-96 md:size-128" src={image!} alt={product?.name}/>
-                    <div className="w-full flex max-w-96 md:max-w-lg mt-3 gap-x-2">
+                    <div className="w-full flex max-w-96 flex-wrap md:max-w-lg mt-3 gap-2">
                         {product?.images.map(image => 
-                            <img onClick={()=>setImage(image)} key={image} className="bg-white opacity-60 hover:opacity-100 cursor-pointer size-24 rounded-md" src={image} alt={product.name} />
+                            <img onClick={()=>setImage(image)} key={image} className="bg-white opacity-60 hover:opacity-100 cursor-pointer size-16 md:size-24 rounded-md" src={image} alt={product.name} />
                         )}
                     </div>
                 </div>
@@ -103,7 +105,27 @@ const ProductoPage = () => {
                     <p className="text-2xl font-semibold text-[#B86112] mb-2">{formatearMoneda(product!.price)}</p>
                     <div className="prose text-lg font-normal mb-4 tiptap" dangerouslySetInnerHTML={{ __html: descriptionHtml }}/>
                     {!user ? (
-                        <button disabled={!product.onStock} className={`bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white px-6 py-3 rounded-lg transition-colors duration-300 ${product.onStock ? "cursor-pointer" : "cursor-no-drop"}`}>COMPRAR</button>
+                        <>
+                            <button 
+                                onClick={()=>{
+                                    dispatch({
+                                        type: "ADD_ITEM",
+                                        payload: {
+                                            _id: product._id,
+                                            name: product.name,
+                                            price: product.price,
+                                            image: product.images[0],
+                                            url: product.url,
+                                            quantity: 1
+                                        }
+                                    })
+                                    toast.success('Producto agregado al carrito')
+                                }}
+                                disabled={!product.onStock} 
+                                className={`bg-black hover:bg-[#1e1e1e] font-semibold text-white px-6 py-3 rounded-lg transition-colors duration-300 mr-2 ${product.onStock ? "cursor-pointer" : "cursor-no-drop"}`}
+                            >CARRITO</button>
+                            <button disabled={!product.onStock} className={`bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white px-6 py-3 rounded-lg transition-colors duration-300 ${product.onStock ? "cursor-pointer" : "cursor-no-drop"}`}>COMPRAR</button>
+                        </>
                     ) : (
                         <button onClick={()=> {
                             setProductToEdit({

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 import { Work_Sans } from 'next/font/google';
 import "./globals.css";
-import { ConvexClientProvider } from '@/utils/convex-provider';
+import { ConvexClientProvider } from '@/providers/convex-provider';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -11,6 +11,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { EdgeStoreProvider } from '@/utils/edgestore';
 import SearchCommand from '@/components/Search';
+import { CartProvider } from '@/providers/cart-provider';
 
 const workSans = Work_Sans({subsets: ["latin"]});
 
@@ -37,16 +38,18 @@ export default function RootLayout({
       <body className={workSans.className}>
         <ConvexClientProvider>
           <EdgeStoreProvider>
-            <AuthProvider>
-              <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
-                <Toaster position='bottom-center'/>
-                <ScrollToTop/>
-                <Navbar/>
-                <SearchCommand/>
-                {children}
-                <Footer/>
-              </GoogleOAuthProvider>
-            </AuthProvider>
+            <CartProvider>
+              <AuthProvider>
+                <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
+                  <Toaster position='bottom-center'/>
+                  <ScrollToTop/>
+                  <Navbar/>
+                  <SearchCommand/>
+                  {children}
+                  <Footer/>
+                </GoogleOAuthProvider>
+              </AuthProvider>
+            </CartProvider>
           </EdgeStoreProvider>
         </ConvexClientProvider>
       </body>

@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.60.2",
+    "@clerk/nextjs": "^6.37.5",
     "@convex-dev/auth": "^0.0.90",
     "@edgestore/react": "^0.7.0",
     "@edgestore/server": "^0.7.0",
