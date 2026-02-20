@@ -225,6 +225,8 @@ export function ProductForm({initialData}: ProductProps){
     }, [user, router])
 
     useEffect(()=>{
+        if(user === undefined ) return;
+
         if(isMounted && !user?.admin){
             router.push('/')
         }

@@ -38,6 +38,8 @@ const DasboardPage = () => {
     }, [user, router])
 
     useEffect(()=>{
+        if(user === undefined ) return;
+        
         if(!user?.admin){
             router.push('/')
         }
@@ -49,8 +51,10 @@ const DasboardPage = () => {
                 <div className="w-[90%] md:w-[80%] flex flex-col justify-center items-center">
                     <main className="p-6 w-full">
                         <section className="flex flex-col sm:flex-row justify-between items-center mb-4">
-                            <div>
-                                <div className="h-6 bg-gray-300 rounded w-48 mb-2">
+                            <div className="">
+                                <div className="h-6 bg-gray-300 rounded w-48 mb-2"></div>
+                                <div className="flex items-center space-x-4">
+                                    <div className="h-10 bg-gray-300 rounded w-32"></div>
                                 </div>
                             </div>
                         </section>
