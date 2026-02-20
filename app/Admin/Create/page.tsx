@@ -2,7 +2,6 @@
 
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { ImageUploader } from "@/components/upload/multi-image";
 import { 
@@ -33,8 +32,9 @@ const CreateProductPage = () => {
 }
 
 export function ProductForm({initialData}: ProductProps){
-    const { user, loading } = useAuth();
     const router = useRouter()
+    const user = useQuery(api.users.getCurrentUser)
+
     const {edgestore} = useEdgeStore()
 
     const [isMounted, setIsMounted] = useState(false);
@@ -42,12 +42,6 @@ export function ProductForm({initialData}: ProductProps){
     useEffect(()=>{
         setIsMounted(true);
     }, []);
-
-    useEffect(()=>{
-        if(isMounted && !loading && !user){
-            router.push('/');
-        }
-    }, [isMounted, loading, user, router])
 
     const setProductToEdit = useEditProduct(
         (state) => state.setProductToEdit
@@ -224,9 +218,27 @@ export function ProductForm({initialData}: ProductProps){
         })
     }
 
-    if(loading || !isMounted) return null;
+    useEffect(() =>{
+        if(user === null){
+            router.push('/')
+        }
+    }, [user, router])
 
-    if(!user) return null
+    useEffect(()=>{
+        if(isMounted && !user?.admin){
+            router.push('/')
+        }
+    }, [isMounted, user, router])
+
+    if(user === undefined){
+        return (
+            <div className="animate-pulse p-4">
+                <div className="h-6 bg-gray-300 rounded w-1/4 mb-4"></div>
+                <div className="h-4 bg-gray-300 rounded w-1/2 mb-2"></div>
+                <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+            </div>
+        )
+    }
 
     return (
         <>

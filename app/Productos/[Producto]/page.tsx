@@ -9,12 +9,11 @@ import StarterKit from "@tiptap/starter-kit";
 import { formatearMoneda } from "@/utils/CurrencyFormat";
 import Product from "@/components/Product";
 import { toast } from "sonner";
-import { useAuth } from "@/context/AuthContext";
 import { useEditProduct } from "@/utils/editProduct";
 import { useCart } from "@/providers/cart-provider";
 
 const ProductoPage = () => {
-    const { user, loading } = useAuth();
+    const user = useQuery(api.users.getCurrentUser);
     const { dispatch } = useCart();
 
     const router = useRouter();
@@ -87,8 +86,6 @@ const ProductoPage = () => {
         return null
     }
 
-    if(loading) return null
-
     return (
         <section className="flex flex-col items-center justify-center mt-8 mb-16">
             <div className="w-[90%] flex flex-col md:flex-row justify-center max-w-300 gap-y-8">
@@ -104,7 +101,7 @@ const ProductoPage = () => {
                     <h2 className="text-[30px] font-semibold mb-2">{product?.name}</h2>
                     <p className="text-2xl font-semibold text-[#B86112] mb-2">{formatearMoneda(product!.price)}</p>
                     <div className="prose text-lg font-normal mb-4 tiptap" dangerouslySetInnerHTML={{ __html: descriptionHtml }}/>
-                    {!user ? (
+                    {!user?.admin ? (
                         <>
                             <button 
                                 onClick={()=>{

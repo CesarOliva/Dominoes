@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Search, ShoppingCart, User } from "lucide-react";
+import { ChevronDown, Search, User } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import Link from 'next/link';
 import { useConvexAuth, useQuery } from "convex/react";

@@ -3,19 +3,6 @@ import { mutation, MutationCtx, query } from "./_generated/server";
 import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
 import { paginationOptsValidator } from "convex/server";
-import { Images } from "lucide-react";
-
-
-//Get if the login email is the same as the one on the table admins
-export const getAdmin = query({
-    args: {},
-    handler: async (ctx) => {
-        const admin = await ctx.db
-            .query("admins").unique()
-
-        return admin;
-    },
-})
 
 //Get categories or create if doesnt exist
 async function getOrCreateCategory(
@@ -23,6 +10,18 @@ async function getOrCreateCategory(
     name: string,
     parentCategory?: Id<"categories">
 ) {
+    const identity = await ctx.auth.getUserIdentity()
+
+    if(!identity) throw new Error('No autenticado')
+
+    const user = await ctx.db.query("users")
+        .filter(q => q.eq(q.field("clerkId"), identity.subject))
+        .unique()
+        
+    if(!user?.admin){
+        throw new Error('No autorizado')
+    }
+
     const existing = await ctx.db
         .query("categories")
         .withIndex("by_name_parent", q =>
@@ -51,6 +50,18 @@ export const createProduct = mutation({
         subCategoryName: v.string(),
     },
     handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity()
+
+        if(!identity) throw new Error('No autenticado')
+
+        const user = await ctx.db.query("users")
+            .filter(q => q.eq(q.field("clerkId"), identity.subject))
+            .unique()
+            
+        if(!user?.admin){
+            throw new Error('No autorizado')
+        }
+
         const existingProduct = await ctx.db
             .query("products")
             .withIndex("by_url", q => q.eq("url", args.url))
@@ -97,6 +108,18 @@ export const updateProduct = mutation({
         images: v.array(v.string())
     },
     handler: async(ctx, args)=> {
+        const identity = await ctx.auth.getUserIdentity()
+
+        if(!identity) throw new Error('No autenticado')
+
+        const user = await ctx.db.query("users")
+            .filter(q => q.eq(q.field("clerkId"), identity.subject))
+            .unique()
+            
+        if(!user?.admin){
+            throw new Error('No autorizado')
+        }
+        
         const categoryId = await getOrCreateCategory(
             ctx,
             args.category
@@ -126,6 +149,18 @@ export const updateStock = mutation({
     args: {
         id: v.id("products"),
     }, handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity()
+
+        if(!identity) throw new Error('No autenticado')
+
+        const user = await ctx.db.query("users")
+            .filter(q => q.eq(q.field("clerkId"), identity.subject))
+            .unique()
+            
+        if(!user?.admin){
+            throw new Error('No autorizado')
+        }
+
         const product = await ctx.db.get(args.id)
 
         if(!product) {
@@ -146,6 +181,18 @@ export const removeProduct = mutation({
         url: v.string(),
     },
     handler: async (ctx, { url }) => {
+        const identity = await ctx.auth.getUserIdentity()
+
+        if(!identity) throw new Error('No autenticado')
+
+        const user = await ctx.db.query("users")
+            .filter(q => q.eq(q.field("clerkId"), identity.subject))
+            .unique()
+            
+        if(!user?.admin){
+            throw new Error('No autorizado')
+        }
+
         const product =  await ctx.db
             .query("products")
             .filter((q) => q.eq(q.field("url"), url))
@@ -166,6 +213,18 @@ export const removeImage = mutation({
         id: v.id("products"),
         images: v.array(v.string()),
     }, handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity()
+
+        if(!identity) throw new Error('No autenticado')
+
+        const user = await ctx.db.query("users")
+            .filter(q => q.eq(q.field("clerkId"), identity.subject))
+            .unique()
+            
+        if(!user?.admin){
+            throw new Error('No autorizado')
+        }
+    
         const product = await ctx.db.get(args.id)
 
         if(!product) {

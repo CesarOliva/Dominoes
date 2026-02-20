@@ -23,8 +23,11 @@ export default defineSchema({
     .index("by_name_parent", ["categoryName", "parentCategory"]),
 
     //To compare at login to accept
-    admins: defineTable({
-        email: v.string(),
+    users: defineTable({
+        clerkId: v.string(),
+        email: v.optional(v.string()),
+        name: v.optional(v.string()),
+        admin: v.boolean()
     })
-    .index("by_email", ["email"]),
+    .index("by_role", ["admin"]),
 });
