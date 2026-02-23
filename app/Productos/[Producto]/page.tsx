@@ -11,6 +11,7 @@ import Product from "@/components/Product";
 import { toast } from "sonner";
 import { useEditProduct } from "@/utils/editProduct";
 import { useCart } from "@/providers/cart-provider";
+import { useCheckoutStore } from "@/utils/checkoutStore";
 
 const ProductoPage = () => {
     const user = useQuery(api.users.getCurrentUser);
@@ -20,6 +21,8 @@ const ProductoPage = () => {
     const params = useParams<{ Producto: string }>();
     const producto = params.Producto;
 
+    const setProductSlug = useCheckoutStore((s)=> s.setProductSlug)
+
     const product = useQuery(api.products.getSingleProduct,
         producto ? { url: producto } : "skip"
     );
@@ -28,7 +31,7 @@ const ProductoPage = () => {
 
     const [descriptionJson, setDescriptionJson] = useState<any>(null);
     const [image, setImage] = useState<string | null>(null)
-0
+
     const descriptionHtml = useMemo(() => {
         if (!product?.description) return '';
         
@@ -102,7 +105,7 @@ const ProductoPage = () => {
                     <p className="text-2xl font-semibold text-[#B86112] mb-2">{formatearMoneda(product!.price)}</p>
                     <div className="prose text-lg font-normal mb-4 tiptap" dangerouslySetInnerHTML={{ __html: descriptionHtml }}/>
                     {!user?.admin ? (
-                        <>
+                        <div className="flex">
                             <button 
                                 onClick={()=>{
                                     dispatch({
@@ -121,8 +124,17 @@ const ProductoPage = () => {
                                 disabled={!product.onStock} 
                                 className={`bg-black hover:bg-[#1e1e1e] font-semibold text-white px-6 py-3 rounded-lg transition-colors duration-300 mr-2 ${product.onStock ? "cursor-pointer" : "cursor-no-drop"}`}
                             >CARRITO</button>
-                            <button disabled={!product.onStock} className={`bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white px-6 py-3 rounded-lg transition-colors duration-300 ${product.onStock ? "cursor-pointer" : "cursor-no-drop"}`}>COMPRAR</button>
-                        </>
+                            <button
+                                onClick={()=> {
+                                    setProductSlug(product.url)
+                                    router.push('/Checkout')
+                                }}
+                                disabled={!product.onStock} 
+                                className="bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white px-6 py-3 rounded-lg transition-colors duration-300 cursor-pointer"
+                            >
+                                COMPRAR
+                            </button>
+                        </div>
                     ) : (
                         <button onClick={()=> {
                             setProductToEdit({

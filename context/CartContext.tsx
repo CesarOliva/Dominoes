@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useReducer } from "react";
+import { createContext } from "react";
 
 export type CartItem = {
     _id: string
