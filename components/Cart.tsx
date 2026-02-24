@@ -7,13 +7,18 @@ import { ShoppingCart, X, Plus, Minus, Trash2 } from 'lucide-react';
 import { formatearMoneda } from "@/utils/CurrencyFormat";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCheckoutStore } from "@/utils/checkoutStore";
 
 const Cart = () => {
+    const router = useRouter();
+
     const [isMounted, setIsMounted] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const cartRef = useRef<HTMLDivElement>(null);
   
     const {state, dispatch} = useCart();
+    const { clear } = useCheckoutStore();
 
     const total = state.items.reduce(
         (acc: any, item: CartItem) => acc + item.price * item.quantity, 0
@@ -139,7 +144,10 @@ const Cart = () => {
                                 Vaciar
                                 </button>
                                 <button
-                                    onClick={() => {/* Checkout */}}
+                                    onClick={() => {
+                                        clear();
+                                        router.push('/Checkout');
+                                    }}
                                     className="flex-1 px-4 py-2 bg-[#B86112] text-white rounded-lg font-medium hover:bg-[#9E4F0F] cursor-pointer"
                                 >
                                 Pagar

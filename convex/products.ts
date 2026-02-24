@@ -302,6 +302,29 @@ export const getSingleProduct = query({
     },
 });
 
+//Get products for payment
+export const getMultipleProducts = query({
+    args: {
+        url: v.array(v.string()),
+    },
+    handler: async (ctx, args) => {
+        const products = [];
+        
+        for (const url of args.url) {
+            const product = await ctx.db
+                .query("products")
+                .withIndex("by_url", (q) => q.eq("url", url))
+                .first();
+            
+            if (product) {
+                products.push(product);
+            }
+        }
+        
+        return products;
+    },
+});
+
 //Get products for admin dashboard
 export const getAllProducts = query({
     args: {},

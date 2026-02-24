@@ -30,4 +30,39 @@ export default defineSchema({
         admin: v.boolean()
     })
     .index("by_role", ["admin"]),
+
+    orders: defineTable({
+        userId: v.string(),
+
+        customerData: v.object({
+            name: v.string(),
+            email: v.string(),
+            telefono: v.number(),
+            mensaje: v.string(),
+        }),
+
+        shippingAddress: v.object({
+            calle: v.string(),
+            colonia: v.string(),
+            cp: v.number(),
+            ciudad: v.string(),
+            estado: v.string(),
+        }),
+
+        items: v.array(v.object({
+            productId: v.string(),
+            name: v.string(),
+            price: v.number(),
+            quantity: v.number(),
+            image: v.optional(v.string()),
+        })),
+
+        total: v.number(),
+        status: v.string(),
+        createdAt: v.number(),
+        updatedAt: v.number(),
+    })
+    .index("by_userId", ["userId"])
+    .index("by_status", ["status"])
+    .index("by_createdAt", ["createdAt"]),
 });

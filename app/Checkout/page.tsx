@@ -1,13 +1,16 @@
 "use client";
 
-import CheckOutSP from "@/components/Payments/MPSingle";
 import { api } from "@/convex/_generated/api";
 import { useCheckoutStore } from "@/utils/checkoutStore";
 import { formatearMoneda } from "@/utils/CurrencyFormat";
 import { useQuery } from "convex/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { useCart } from "@/providers/cart-provider";
+import { CartItem } from "@/context/CartContext";
+import { Minus, Plus } from "lucide-react";
+import CheckoutMP from "@/components/Payments/MercadoPagoCart";
+import { toast } from "sonner";
 
 interface Contacto {
     nombre: string;
@@ -26,25 +29,34 @@ interface Direccion {
 
 const Checkout = () => {
     const url = useCheckoutStore((s)=> s.productSlug)
-    const router = useRouter()
+    const [mounted, setMounted] = useState<boolean>(false);
+    const [validated, setValidated] = useState<boolean>(false);
 
-    if(!url){
-        return <div>No hay producto seleccionado</div>
-    }
+    const {state, dispatch} = useCart();
+
+    const isDirectCheckout = !!url
+
+    const total = state.items.reduce(
+        (acc: any, item: CartItem) => acc + item.price * item.quantity, 0
+    )
 
     const user = useQuery(api.users.getCurrentUser);
-    const product = useQuery(api.products.getSingleProduct, {url})    
+
+    const product = useQuery(
+        api.products.getSingleProduct,
+        isDirectCheckout ? {url} : "skip"
+    )    
 
     const [currentStep, setCurrentStep] = useState<number>(1);
 
-    const [contactData, setContactData] = useState<Contacto>({
+    const [customerData, setCustomerData] = useState<Contacto>({
         nombre: '',
         email: '',
         telefono: 0,
         mensaje: '',
     });
 
-    const [addressData, setAddressData] = useState<Direccion>({
+    const [shippingData, setShippingData] = useState<Direccion>({
         calle: '',
         colonia: '',
         cp: 0,
@@ -54,17 +66,21 @@ const Checkout = () => {
 
     useEffect(() => {
         if (user) {
-            setContactData(prev => ({
+            setCustomerData(prev => ({
                 ...prev,
                 nombre: user.name || '',
                 email: user.email || '',
             }));
         }
     }, [user]);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
     
     const handleContactChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
         const { name, value } = e.target;
-        setContactData((prev) => ({
+        setCustomerData((prev) => ({
             ...prev,
             [name]: value
         }));
@@ -72,7 +88,7 @@ const Checkout = () => {
 
     const handleAddressChange = (e: ChangeEvent<HTMLInputElement>): void => {
         const { name, value } = e.target;
-        setAddressData((prev) => ({
+        setShippingData((prev) => ({
             ...prev,
             [name]: value
         }));
@@ -83,25 +99,65 @@ const Checkout = () => {
         setCurrentStep(2);
     };
 
-    const handleSecondSubmit = (e: FormEvent<HTMLFormElement>): void => {
+    const handleSecondSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setValidated(false);
+        
+        if(customerData.nombre.trim() === ''){
+            toast.error('Nombre requerido')
+            return;
+        }
+        if(customerData.email.trim() === ''){
+            toast.error('Email requerido')
+            return;
+        }
+        if(customerData.telefono === 0){
+            toast.error('Teléfono requerido')
+            return;
+        }
+        if(shippingData.calle.trim() === ''){
+            toast.error('Calle requerida')
+            return;
+        }
+        if(shippingData.colonia.trim() === ''){
+            toast.error('Colonia requerida')
+            return;
+        }
+        if(shippingData.cp === 0){
+            toast.error('Código postal requerido')
+            return;
+        }
+        if(shippingData.ciudad.trim() === ''){
+            toast.error('Ciudad requerida')
+            return;
+        }
+        if(shippingData.estado.trim() === ''){
+            toast.error('Estado requerido')
+            return;
+        }
+
         setCurrentStep(3);
+        setValidated(true);
     };
 
-    const goToPreviousStep = ()=>{
-        setCurrentStep(1)
+    const goToPreviousStep = (numero: number)=>{
+        setCurrentStep(numero-1)
     }
 
-    if (product === undefined) {
-        return (
-            <button disabled className="bg-gray-400 text-white px-6 py-3 rounded-lg cursor-wait">Cargando...</button>
-        );
+    if(isDirectCheckout){
+        if (product === undefined) {
+            return (
+                <button disabled className="bg-gray-400 text-white px-6 py-3 rounded-lg cursor-wait">Cargando...</button>
+            );
+        }
+
+        if(!product) return <>...</>        
     }
 
     return (
         <section className="flex items-center justify-center py-16 md:mb-0">
             <div className="w-[90%] flex flex-col md:flex-row justify-center max-w-300">
-                <div className="order-1 md:order-0 px-6 py-4 w-full md:w-1/2 text-center md:text-start">
+                <div className="px-6 py-4 w-full md:w-1/2 text-center md:text-start">
                     {currentStep === 1 && (
                         <>
                             <h2 className='text-4xl font-semibold mb-4'>Información de Contacto</h2>
@@ -113,23 +169,23 @@ const Checkout = () => {
                                         type="text"
                                         id="nombre"
                                         name="nombre"
-                                        value={contactData.nombre}
+                                        value={customerData.nombre}
                                         onChange={handleContactChange}
-                                        required
+                                        
                                         placeholder="Nombre"
                                     />
                                 </div>
 
                                 <div className='flex flex-row items-center gap-x-2'>
-                                    <label htmlFor="correo" className='text-lg '>Correo:</label>
+                                    <label htmlFor="email" className='text-lg '>Correo:</label>
                                     <input
                                         className='w-full p-2 border border-neutral-300 rounded-md'
                                         type="text"
-                                        id="correo"
-                                        name="correo"
-                                        value={contactData.email}
+                                        id="email"
+                                        name="email"
+                                        value={customerData.email}
                                         onChange={handleContactChange}
-                                        required
+                                        
                                         placeholder="Email"
                                     />
                                 </div>
@@ -141,20 +197,22 @@ const Checkout = () => {
                                         type="number"
                                         id="telefono"
                                         name="telefono"
-                                        value={contactData.telefono}
+                                        value={customerData.telefono}
                                         onChange={handleContactChange}
-                                        required
+                                        
                                         placeholder="Telefono"
                                     />
                                 </div>
 
                                 <div className='flex flex-col gap-x-2'>
-                                    <label htmlFor="mensaje" className='text-lg '>Mensaje:</label>
+                                    <div className="w-full items-start flex">
+                                        <label htmlFor="mensaje" className='text-lg '>Mensaje:</label>
+                                    </div>
                                     <textarea
                                         className='p-2 min-h-16 max-h-32 border border-neutral-300 rounded-md'
                                         id="mensaje"
                                         name="mensaje"
-                                        value={contactData.mensaje}
+                                        value={customerData.mensaje}
                                         onChange={handleContactChange}
                                         placeholder="Escribe tu mensaje..."
                                     />
@@ -183,9 +241,9 @@ const Checkout = () => {
                                         type="text"
                                         id="calle"
                                         name="calle"
-                                        value={addressData.calle}
+                                        value={shippingData.calle}
                                         onChange={handleAddressChange}
-                                        required
+                                        
                                         placeholder="Calle y número"
                                     />
                                 </div>
@@ -197,9 +255,9 @@ const Checkout = () => {
                                         type="text"
                                         id="colonia"
                                         name="colonia"
-                                        value={addressData.colonia}
+                                        value={shippingData.colonia}
                                         onChange={handleAddressChange}
-                                        required
+                                        
                                         placeholder="Colonia"
                                     />
                                 </div>
@@ -211,9 +269,9 @@ const Checkout = () => {
                                         type="number"
                                         id="cp"
                                         name="cp"
-                                        value={addressData.cp}
+                                        value={shippingData.cp}
                                         onChange={handleAddressChange}
-                                        required
+                                        
                                         placeholder="Código Postal"
                                     />
                                 </div>
@@ -225,9 +283,9 @@ const Checkout = () => {
                                         type="text"
                                         id="ciudad"
                                         name="ciudad"
-                                        value={addressData.ciudad}
+                                        value={shippingData.ciudad}
                                         onChange={handleAddressChange}
-                                        required
+                                        
                                         placeholder="Ciudad"
                                     />
                                 </div>
@@ -239,9 +297,9 @@ const Checkout = () => {
                                         type="text"
                                         id="estado"
                                         name="estado"
-                                        value={addressData.estado}
+                                        value={shippingData.estado}
                                         onChange={handleAddressChange}
-                                        required
+                                        
                                         placeholder="Estado"
                                     />
                                 </div>
@@ -249,7 +307,7 @@ const Checkout = () => {
                                 <div className='flex justify-end mt-2'>
                                     <button type="button"
                                         className={`bg-neutral-800 hover:bg-neutral-700 font-semibold text-white px-4 py-2 rounded-lg transition-colors duration-300 mr-2 cursor-pointer`}
-                                        onClick={goToPreviousStep}
+                                        onClick={() => goToPreviousStep(2)}
                                     >
                                         ANTERIOR
                                     </button>
@@ -257,16 +315,36 @@ const Checkout = () => {
                                         className={`bg-[#B86112] hover:bg-[#cb7818] font-semibold text-white px-4 py-2 rounded-lg transition-colors duration-300 cursor-pointer`}
                                         type="submit"
                                     >
-                                    SIGUIENTE
+                                        LISTO
                                     </button>
                                 </div>
                             </form>
                         </>
                     )}
+
+                    {currentStep == 3 && (
+                        <>
+                            <h2 className='text-4xl font-semibold mb-4'>Importante</h2>
+                            <p className="text-lg mb-4">Serás redirigido a MercadoPago para finalizar tu compra de forma segura.<br/>
+                            Asegúrate de revisar toda la información antes de proceder. ¡Gracias por tu compra!</p>    
+                            <p className="text-md italic text-gray-600">Nota: Después de completar tu compra, 
+                                nos pondremos en contacto contigo a través de WhatsApp para confirmar los detalles de tu pedido y personalización. 
+                                ¡Gracias por elegirnos!
+                            </p>
+                            <div className='flex justify-end mt-2'>
+                                <button type="button"
+                                    className={`bg-neutral-800 hover:bg-neutral-700 font-semibold text-white px-4 py-2 rounded-lg transition-colors duration-300 mr-2 cursor-pointer`}
+                                    onClick={() => goToPreviousStep(3)}
+                                >
+                                    ANTERIOR
+                                </button>
+                            </div>
+                        </>
+                    )}
                 </div>
 
-                <div className="order-0 md:order-1 px-6 py-4 w-full md:w-1/2 flex flex-col">
-                    <>
+                {isDirectCheckout ? (
+                    <div className="px-6 py-4 w-full md:w-1/2 flex flex-col">
                         <h2 className='text-4xl font-semibold mb-4'>Resumen del pedido</h2>
                         <div className="flex flex-col">
                             <div className="flex">
@@ -281,18 +359,104 @@ const Checkout = () => {
 
                             <div className="border-t mt-4 border-gray-200 p-4">
                                 <div className="flex justify-between items-center mb-4">
-                                    <span className="font-semibold text-gray-700">Total:</span>
+                                    <span className="text-xl font-semibold">Total:</span>
                                     <span className="text-xl font-bold text-[#B86112]">{formatearMoneda(product!.price)}</span>
                                 </div>
                                 
                                 <div className='flex justify-end mt-2'>
-                                    <CheckOutSP url={url}/>
+                                    {validated ? (
+                                        <CheckoutMP url={url} customerData={customerData} shippingData={shippingData}/>
+                                    ): (
+                                        <button disabled className={`bg-neutral-500 font-semibold text-white px-4 py-2 rounded-lg transition-colors duration-300 cursor-not-allowed`}>
+                                            COMPRAR
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
+                    </div>
+                ) : (
+                    <>
+                        {!mounted ? (
+                            <div className="px-6 py-4 w-full md:w-1/2 flex flex-col">
+                                <div className="h-8 w-1/4 bg-gray-300 rounded mb-4 animate-pulse"></div>
+                                <div className="w-full flex flex-col gap-y-4">
+                                    <div className="flex items-center gap-x-4">
+                                        <div className="w-16 h-16 bg-gray-300 rounded-md animate-pulse"></div>
+                                        <div className="flex-1">
+                                            <div className="h-4 w-3/4 bg-gray-300 rounded mb-2 animate-pulse"></div>
+                                            <div className="h-4 w-1/4 bg-gray-300 rounded mb-2 animate-pulse"></div>
+                                        </div>
+                                    </div>
+                                    <div className="h-4 w-full bg-gray-300 rounded mb-2 animate-pulse"></div>
+                                    <div className="h-4 w-1/2 bg-gray-300 rounded mb-2 animate-pulse"></div>
+                                    <div className="h-10 w-1/3 bg-gray-300 rounded animate-pulse"></div>
+                                </div>
+                            </div>
 
+                        ) : (
+                            <div className="px-6 py-4 w-full md:w-1/2 flex flex-col">
+                                <h2 className='text-4xl font-semibold mb-4'>Resumen del pedido</h2>
+                                {state.items.map((item: CartItem) => (
+                                    <div key={item._id} className="cartProduct flex flex-col mb-3">
+                                        <div className="flex flex-row justify-between">
+                                            <div className="flex">
+                                                <Link href={`/Productos/${item.url}`} className="w-16 h-16 bg-gray-100 rounded-md overflow-hidden shrink-0">
+                                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover"/>
+                                                </Link>
+                                                <div className="ml-3">
+                                                    <Link href={`/Productos/${item?.url}`} className="font-medium text-lg text-gray-800 truncate pr-2">{item?.name}</Link>
+                                                    <p className='text-md font-medium text-[#B86112] mb-2'>{formatearMoneda(item!.price)}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <div className="flex flex-row gap-1 items-center mb-2">
+                                                    <button
+                                                        onClick={() => dispatch({ type: "DECREASE_QTY", payload: item._id })}
+                                                        className="p-1 hover:bg-gray-100 rounded-full cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                                        disabled={item.quantity <= 1}
+                                                    >
+                                                        <Minus className="size-3" />
+                                                    </button>
+                                                
+                                                    <span className="w-6 text-center text-md font-medium">{item.quantity}</span>
+                                                
+                                                    <button
+                                                        onClick={() => dispatch({ type: "INCREASE_QTY", payload: item._id })}
+                                                        className="p-1 hover:bg-gray-100 rounded-full cursor-pointer"
+                                                    >
+                                                        <Plus className="size-3" />
+                                                    </button>
+                                                </div>
+                                            
+                                                <span className="ml-auto text-md font-semibold text-[#B86112]">
+                                                    {formatearMoneda(item.price * item.quantity)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                                
+                                <div className="border-t mt-4 border-gray-200 p-4">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <span className="text-xl font-semibold">Total:</span>
+                                        <span className="text-xl font-bold text-[#B86112]">{formatearMoneda(total)}</span>
+                                    </div>
+                                    
+                                    <div className='flex justify-end mt-2'>
+                                        {validated ? (
+                                            <CheckoutMP customerData={customerData} shippingData={shippingData}/>
+                                        ): (
+                                            <button disabled className={`bg-neutral-500 font-semibold text-white px-4 py-2 rounded-lg transition-colors duration-300 cursor-not-allowed`}>
+                                                COMPRAR
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </>
-                </div>
+                )}
             </div>
         </section>
     );

@@ -1,6 +1,6 @@
 "use client";
 
-import { CartContext, CartItem, cartReducer } from "@/context/CartContext";
+import { CartContext, cartReducer } from "@/context/CartContext";
 import { useContext, useEffect, useReducer } from "react";
 
 
