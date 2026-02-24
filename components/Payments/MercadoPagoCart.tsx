@@ -3,6 +3,7 @@
 import { api } from "@/convex/_generated/api";
 import { useCart } from "@/providers/cart-provider";
 import { useMutation, useQuery } from "convex/react";
+import { redirect } from "next/dist/server/api-utils";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -166,7 +167,8 @@ const CheckoutMP = ({url, customerData, shippingData}: Props) => {
                         city: shippingData.ciudad,
                         zip: shippingData.cp.toString()
                     }
-                }
+                },
+                redirect_mode: 'blank'
             }
 
             const res = await fetch('/api/create-preference', {

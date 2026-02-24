@@ -44,8 +44,10 @@ export async function POST(request: Request) {
                     pending: `${baseURL}/pending`,
                 },
                 // auto_return: "aproved",
+                binary_mode: true,
                 statement_descriptor: "Dominoes",
                 external_reference: `order_${Date.now()}`,
+                purpose: "wallet_purchase",
             },
         });
 
