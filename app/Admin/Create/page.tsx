@@ -191,6 +191,14 @@ export function ProductForm({initialData}: ProductProps){
                     success: "Producto creado exitosamente!",
                     error: "Error al crear el producto."
                 })
+
+            await Promise.all(
+                images.map((url)=>
+                    edgestore.publicFiles.confirmUpload({
+                        url: url
+                    })
+                )
+            )
         }else{
             const promise = createProduct({
                 name: name,
